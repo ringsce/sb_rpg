@@ -1,6 +1,6 @@
 # Samurai Babel
 
-![Samurai Babel](./Samurai_Babel.png)
+![Samurai Babel](SamuraiBabel.png)
 
 This project features a visually striking image titled "Samurai Babel," showcasing:
 
