@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = untitled1.0.0
-DISTDIR = /Users/pedro/Projects/SB_MMO/untitled/.tmp/untitled1.0.0
+DISTDIR = /Users/pedro/Projects/SB_MMO/sb_rpg/.tmp/untitled1.0.0
 LINK          = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -fobjc-arc -fobjc-arc -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -mmacosx-version-min=11.0 -Wl,-rpath,@executable_path/../Frameworks
 LIBS          = $(SUBLIBS) -L/opt/homebrew/lib -lSDL2 -lSDL2_image -framework OpenGL -framework Metal -framework QuartzCore   
@@ -52,9 +52,9 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ai.cpp \
-		camera.cpp \
-		gamepad.cpp \
+SOURCES       = src/ai.cpp \
+		src/camera.cpp \
+		src/gamepad.cpp \
 		main.cpp 
 OBJECTS       = ai.o \
 		camera.o \
@@ -398,9 +398,9 @@ DIST          = Makefile \
 		/opt/homebrew/share/qt/mkspecs/features/yacc.prf \
 		/opt/homebrew/share/qt/mkspecs/features/lex.prf \
 		untitled.pro ai.h \
-		update ai.cpp \
-		camera.cpp \
-		gamepad.cpp \
+		update src/ai.cpp \
+		src/camera.cpp \
+		src/gamepad.cpp \
 		main.cpp
 QMAKE_TARGET  = untitled
 DESTDIR       = 
@@ -410,12 +410,12 @@ TARGET        = untitled
 EXPORT_QMAKE_MAC_SDK = macosx
 EXPORT_QMAKE_MAC_SDK_VERSION = 15.2
 EXPORT_QMAKE_XCODE_DEVELOPER_PATH = /Applications/Xcode.app/Contents/Developer
-EXPORT__QMAKE_STASH_ = /Users/pedro/Projects/SB_MMO/untitled/.qmake.stash
+EXPORT__QMAKE_STASH_ = /Users/pedro/Projects/SB_MMO/sb_rpg/.qmake.stash
 EXPORT_VALID_ARCHS = arm64
 EXPORT_DEFAULT_ARCHS = arm64
 EXPORT_ARCHS = $(filter $(EXPORT_VALID_ARCHS), $(if $(ARCHS), $(ARCHS), $(if $(EXPORT_DEFAULT_ARCHS), $(EXPORT_DEFAULT_ARCHS), $(EXPORT_VALID_ARCHS))))
 EXPORT_ARCH_ARGS = $(foreach arch, $(if $(EXPORT_ARCHS), $(EXPORT_ARCHS), $(EXPORT_VALID_ARCHS)), -arch $(arch))
-EXPORT__PRO_FILE_ = /Users/pedro/Projects/SB_MMO/untitled/untitled.pro
+EXPORT__PRO_FILE_ = /Users/pedro/Projects/SB_MMO/sb_rpg/untitled.pro
 
 
 include /opt/homebrew/Cellar/qt/6.7.3/share/qt/mkspecs/features/mac/sdk.mk
@@ -1146,14 +1146,14 @@ compiler_clean:
 
 ####### Compile
 
-ai.o: ai.cpp AI.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ai.o ai.cpp
+ai.o: src/ai.cpp src/AI.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ai.o src/ai.cpp
 
-camera.o: camera.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o camera.o camera.cpp
+camera.o: src/camera.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o camera.o src/camera.cpp
 
-gamepad.o: gamepad.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gamepad.o gamepad.cpp
+gamepad.o: src/gamepad.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gamepad.o src/gamepad.cpp
 
 main.o: main.cpp /opt/homebrew/include/SDL2/SDL.h \
 		/opt/homebrew/include/SDL2/SDL_main.h \

@@ -16,9 +16,9 @@ QT += sql
 
 # Source Files
 SOURCES += \
-    ai.cpp \
-    camera.cpp \
-    gamepad.cpp \
+    src/ai.cpp \
+    src/camera.cpp \
+    src/gamepad.cpp \
     main.cpp
     #srv/serverRegistration.cpp
 
