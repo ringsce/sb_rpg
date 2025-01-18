@@ -2,9 +2,6 @@
 
 ![Samurai Babel](SamuraiBabel.png)
 
-# Samurai Babel
-
-![Samurai Babel](./A_striking_image_featuring_a_dramatic_black-and-wh.png)
 
 ## Ekron Universe
 
