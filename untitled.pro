@@ -148,4 +148,5 @@ QMAKE_LFLAGS += -fobjc-arc
 CONFIG += release
 
 HEADERS += \
-    src/ai.h update
+    src/ai.h update \
+    src/gamepad.h
