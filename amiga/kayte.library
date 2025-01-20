@@ -1,0 +1,27 @@
+/* This file defines the function table and versioning for the Kayte library */
+#include <aros/libcall.h>
+#include <aros/exec.h>
+
+const APTR FuncTable[] = {
+    (APTR)KayteInit,
+    (APTR)KayteCompile,
+    (APTR)KayteCleanup,
+    (APTR)-1 // Terminator
+};
+
+struct Library *KayteBase;
+
+const struct Resident ResidentTag = {
+    RTC_MATCHWORD,
+    &ResidentTag,
+    &ResidentTag + 1,
+    RTF_AUTOINIT,
+    1,
+    NT_LIBRARY,
+    0,
+    "kayte.library",
+    "1.0",
+    (APTR)FuncTable,
+    NULL
+};
+

@@ -148,4 +148,4 @@ QMAKE_LFLAGS += -fobjc-arc
 CONFIG += release
 
 HEADERS += \
-    ai.h update
+    src/ai.h update

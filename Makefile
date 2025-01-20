@@ -397,7 +397,7 @@ DIST          = Makefile \
 		/opt/homebrew/share/qt/mkspecs/features/exceptions.prf \
 		/opt/homebrew/share/qt/mkspecs/features/yacc.prf \
 		/opt/homebrew/share/qt/mkspecs/features/lex.prf \
-		untitled.pro ai.h \
+		untitled.pro src/ai.h \
 		update src/ai.cpp \
 		src/camera.cpp \
 		src/gamepad.cpp \
