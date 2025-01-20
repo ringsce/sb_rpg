@@ -2,13 +2,16 @@
 #include <SDL2/SDL_image.h>
 #include "src/gamepad.h"
 #include <iostream>
+
 // Platform-specific includes for cross-platform support
 #if defined(__ANDROID__)
 #include <GLES2/gl2.h>  // OpenGL ES for Android
-#elif defined(__APPLE__) && !defined(__ANDROID__)
+#elif defined(__APPLE__) && !defined(__IOS__)
 #include <OpenGL/gl.h>  // OpenGL for macOS
 #include <OpenGL/glu.h>
 #define GL_SILENCE_DEPRECATION
+#elif defined(__IOS__)
+#include <OpenGLES/ES2/gl.h>  // OpenGL ES for iOS
 #elif defined(__linux__)
 #include <GLES2/gl2.h>  // OpenGL ES for Linux ARM64
 #elif defined(_WIN32)
