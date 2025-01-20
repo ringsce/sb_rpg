@@ -2,6 +2,18 @@
 #include <SDL2/SDL_image.h>
 #include "src/gamepad.h"
 #include <iostream>
+// Platform-specific includes for cross-platform support
+#if defined(__ANDROID__)
+#include <GLES2/gl2.h>  // OpenGL ES for Android
+#elif defined(__APPLE__) && !defined(__ANDROID__)
+#include <OpenGL/gl.h>  // OpenGL for macOS
+#include <OpenGL/glu.h>
+#define GL_SILENCE_DEPRECATION
+#elif defined(__linux__)
+#include <GLES2/gl2.h>  // OpenGL ES for Linux ARM64
+#elif defined(_WIN32)
+#include <GLES2/gl2.h>  // OpenGL ES for Windows ARM64
+#endif
 
 bool InitializeSDL(SDL_Window** window, SDL_GLContext* glContext, const char* title, int width, int height);
 SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* filePath);

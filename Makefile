@@ -1256,7 +1256,8 @@ main.o: main.cpp /opt/homebrew/include/SDL2/SDL.h \
 		/opt/homebrew/include/SDL2/SDL_version.h \
 		/opt/homebrew/include/SDL2/SDL_locale.h \
 		/opt/homebrew/include/SDL2/SDL_misc.h \
-		/opt/homebrew/include/SDL2/SDL_image.h
+		/opt/homebrew/include/SDL2/SDL_image.h \
+		src/gamepad.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 ####### Install
