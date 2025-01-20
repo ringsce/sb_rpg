@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Application settings -->
+    <key>CFBundleName</key>
+    <string>SDL Sample</string>
+    <key>CFBundleDisplayName</key>
+    <string>SDL Sample</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.example.sdlsample</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+
+    <!-- Device capabilities -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UIRequiresFullScreen</key>
+    <true/>
+
+    <!-- Permissions (iOS specific) -->
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires access to the camera.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app requires access to the microphone.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to the photo library.</string>
+
+    <!-- Graphics settings -->
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UIStatusBarHidden</key>
+    <true/>
+</dict>
+</plist>
+
