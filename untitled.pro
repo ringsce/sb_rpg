@@ -16,8 +16,10 @@ QT += sql
 
 # Source Files
 SOURCES += \
+    game_utils.cpp \
     src/ai.cpp \
     src/camera.cpp \
+    src/credits.cpp \
     src/gamepad.cpp \
     main.cpp
     #srv/serverRegistration.cpp
@@ -148,5 +150,6 @@ QMAKE_LFLAGS += -fobjc-arc
 CONFIG += release
 
 HEADERS += \
+    game_utils.h \
     src/ai.h update \
     src/gamepad.h

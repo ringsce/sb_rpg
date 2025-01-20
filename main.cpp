@@ -1,7 +1,8 @@
+// main.cpp
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "src/gamepad.h"
 #include <iostream>
+#include "game_utils.h"
 
 // Platform-specific includes for cross-platform support
 #if defined(__ANDROID__)
@@ -18,11 +19,17 @@
 #include <GLES2/gl2.h>  // OpenGL ES for Windows ARM64
 #endif
 
+struct Button {
+    int x, y;
+    int width, height;
+    SDL_Color color;
+};
+
 bool InitializeSDL(SDL_Window** window, SDL_GLContext* glContext, const char* title, int width, int height);
-SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* filePath);
+void DrawCredits(SDL_Renderer* renderer, SDL_Texture* fontTexture, SDL_Rect buttonRect);
 
 bool InitializeSDL(SDL_Window** window, SDL_GLContext* glContext, const char* title, int width, int height) {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
         return false;
     }
@@ -50,22 +57,10 @@ bool InitializeSDL(SDL_Window** window, SDL_GLContext* glContext, const char* ti
     return true;
 }
 
-SDL_Texture* LoadTexture(SDL_Renderer* renderer, const char* filePath) {
-    SDL_Surface* surface = IMG_Load(filePath);
-    if (!surface) {
-        std::cerr << "Error loading image: " << IMG_GetError() << std::endl;
-        return nullptr;
-    }
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-
-    if (!texture) {
-        std::cerr << "Error creating texture: " << SDL_GetError() << std::endl;
-    }
-
-    return texture;
-}
+/* to be tested doubled
+ * void DrawCredits(SDL_Renderer* renderer, SDL_Texture* fontTexture, SDL_Rect buttonRect) {
+    SDL_RenderCopy(renderer, fontTexture, nullptr, &buttonRect);
+}*/
 
 int main(int argc, char* argv[]) {
     SDL_Window* window = nullptr;
@@ -93,11 +88,25 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (!InitializeGamepadSubsystem()) {
+    // Load font texture (replace with your own font)
+    /*const char* fontPath = "font.png";
+    SDL_Texture* fontTexture = LoadTexture(renderer, fontPath);
+    if (!fontTexture) {
         return 1;
-    }
+    }to be fixed*/
 
-    DetectConnectedGamepads();
+    Button button;
+    button.x = 50;
+    button.y = 150;
+    button.width = 100;
+    button.height = 30;
+    button.color = {255, 0, 0};
+
+    //SDL_Rect buttonRect = {100, 200, 150, 30};
+    //DrawCredits(renderer, fontTexture, buttonRect);
+    //SDL_RenderPresent(renderer);
+
+    SDL_Delay(16);
 
     bool running = true;
     SDL_Event event;
@@ -107,21 +116,21 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
-            HandleGamepadEvents(event);
         }
 
         SDL_RenderClear(renderer);
+
         SDL_Rect imageRect = {0, 0, 640, 480};
         SDL_RenderCopy(renderer, imageTexture, nullptr, &imageRect);
-        SDL_RenderPresent(renderer);
-        SDL_Delay(16); // 60 FPS
-    }
 
-    for (auto& gamepad : connectedGamepads) {
-        SDL_GameControllerClose(gamepad.controller);
+        //SDL_RenderCopy(renderer, fontTexture, nullptr, &buttonRect);
+        SDL_RenderPresent(renderer);
+
+        SDL_Delay(16);
     }
 
     SDL_DestroyTexture(imageTexture);
+    //SDL_DestroyTexture(fontTexture);
     SDL_DestroyRenderer(renderer);
     SDL_GL_DeleteContext(glContext);
     SDL_DestroyWindow(window);

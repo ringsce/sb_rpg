@@ -52,12 +52,16 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = src/ai.cpp \
+SOURCES       = game_utils.cpp \
+		src/ai.cpp \
 		src/camera.cpp \
+		src/credits.cpp \
 		src/gamepad.cpp \
 		main.cpp 
-OBJECTS       = ai.o \
+OBJECTS       = game_utils.o \
+		ai.o \
 		camera.o \
+		credits.o \
 		gamepad.o \
 		main.o
 DIST          = Makefile \
@@ -397,10 +401,13 @@ DIST          = Makefile \
 		/opt/homebrew/share/qt/mkspecs/features/exceptions.prf \
 		/opt/homebrew/share/qt/mkspecs/features/yacc.prf \
 		/opt/homebrew/share/qt/mkspecs/features/lex.prf \
-		untitled.pro src/ai.h \
+		untitled.pro game_utils.h \
+		src/ai.h \
 		update \
-		src/gamepad.h src/ai.cpp \
+		src/gamepad.h game_utils.cpp \
+		src/ai.cpp \
 		src/camera.cpp \
+		src/credits.cpp \
 		src/gamepad.cpp \
 		main.cpp
 QMAKE_TARGET  = untitled
@@ -1147,11 +1154,119 @@ compiler_clean:
 
 ####### Compile
 
+game_utils.o: game_utils.cpp game_utils.h \
+		/opt/homebrew/include/SDL2/SDL.h \
+		/opt/homebrew/include/SDL2/SDL_main.h \
+		/opt/homebrew/include/SDL2/SDL_stdinc.h \
+		/opt/homebrew/include/SDL2/SDL_config.h \
+		/opt/homebrew/include/SDL2/SDL_platform.h \
+		/opt/homebrew/include/SDL2/begin_code.h \
+		/opt/homebrew/include/SDL2/close_code.h \
+		/opt/homebrew/include/SDL2/SDL_assert.h \
+		/opt/homebrew/include/SDL2/SDL_atomic.h \
+		/opt/homebrew/include/SDL2/SDL_audio.h \
+		/opt/homebrew/include/SDL2/SDL_error.h \
+		/opt/homebrew/include/SDL2/SDL_endian.h \
+		/opt/homebrew/include/SDL2/SDL_mutex.h \
+		/opt/homebrew/include/SDL2/SDL_thread.h \
+		/opt/homebrew/include/SDL2/SDL_rwops.h \
+		/opt/homebrew/include/SDL2/SDL_clipboard.h \
+		/opt/homebrew/include/SDL2/SDL_cpuinfo.h \
+		/opt/homebrew/include/SDL2/SDL_events.h \
+		/opt/homebrew/include/SDL2/SDL_video.h \
+		/opt/homebrew/include/SDL2/SDL_pixels.h \
+		/opt/homebrew/include/SDL2/SDL_rect.h \
+		/opt/homebrew/include/SDL2/SDL_surface.h \
+		/opt/homebrew/include/SDL2/SDL_blendmode.h \
+		/opt/homebrew/include/SDL2/SDL_keyboard.h \
+		/opt/homebrew/include/SDL2/SDL_keycode.h \
+		/opt/homebrew/include/SDL2/SDL_scancode.h \
+		/opt/homebrew/include/SDL2/SDL_mouse.h \
+		/opt/homebrew/include/SDL2/SDL_joystick.h \
+		/opt/homebrew/include/SDL2/SDL_guid.h \
+		/opt/homebrew/include/SDL2/SDL_gamecontroller.h \
+		/opt/homebrew/include/SDL2/SDL_sensor.h \
+		/opt/homebrew/include/SDL2/SDL_quit.h \
+		/opt/homebrew/include/SDL2/SDL_gesture.h \
+		/opt/homebrew/include/SDL2/SDL_touch.h \
+		/opt/homebrew/include/SDL2/SDL_filesystem.h \
+		/opt/homebrew/include/SDL2/SDL_haptic.h \
+		/opt/homebrew/include/SDL2/SDL_hidapi.h \
+		/opt/homebrew/include/SDL2/SDL_hints.h \
+		/opt/homebrew/include/SDL2/SDL_loadso.h \
+		/opt/homebrew/include/SDL2/SDL_log.h \
+		/opt/homebrew/include/SDL2/SDL_messagebox.h \
+		/opt/homebrew/include/SDL2/SDL_metal.h \
+		/opt/homebrew/include/SDL2/SDL_power.h \
+		/opt/homebrew/include/SDL2/SDL_render.h \
+		/opt/homebrew/include/SDL2/SDL_shape.h \
+		/opt/homebrew/include/SDL2/SDL_system.h \
+		/opt/homebrew/include/SDL2/SDL_timer.h \
+		/opt/homebrew/include/SDL2/SDL_version.h \
+		/opt/homebrew/include/SDL2/SDL_locale.h \
+		/opt/homebrew/include/SDL2/SDL_misc.h \
+		/opt/homebrew/include/SDL2/SDL_image.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o game_utils.o game_utils.cpp
+
 ai.o: src/ai.cpp src/AI.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ai.o src/ai.cpp
 
 camera.o: src/camera.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o camera.o src/camera.cpp
+
+credits.o: src/credits.cpp /opt/homebrew/include/SDL2/SDL.h \
+		/opt/homebrew/include/SDL2/SDL_main.h \
+		/opt/homebrew/include/SDL2/SDL_stdinc.h \
+		/opt/homebrew/include/SDL2/SDL_config.h \
+		/opt/homebrew/include/SDL2/SDL_platform.h \
+		/opt/homebrew/include/SDL2/begin_code.h \
+		/opt/homebrew/include/SDL2/close_code.h \
+		/opt/homebrew/include/SDL2/SDL_assert.h \
+		/opt/homebrew/include/SDL2/SDL_atomic.h \
+		/opt/homebrew/include/SDL2/SDL_audio.h \
+		/opt/homebrew/include/SDL2/SDL_error.h \
+		/opt/homebrew/include/SDL2/SDL_endian.h \
+		/opt/homebrew/include/SDL2/SDL_mutex.h \
+		/opt/homebrew/include/SDL2/SDL_thread.h \
+		/opt/homebrew/include/SDL2/SDL_rwops.h \
+		/opt/homebrew/include/SDL2/SDL_clipboard.h \
+		/opt/homebrew/include/SDL2/SDL_cpuinfo.h \
+		/opt/homebrew/include/SDL2/SDL_events.h \
+		/opt/homebrew/include/SDL2/SDL_video.h \
+		/opt/homebrew/include/SDL2/SDL_pixels.h \
+		/opt/homebrew/include/SDL2/SDL_rect.h \
+		/opt/homebrew/include/SDL2/SDL_surface.h \
+		/opt/homebrew/include/SDL2/SDL_blendmode.h \
+		/opt/homebrew/include/SDL2/SDL_keyboard.h \
+		/opt/homebrew/include/SDL2/SDL_keycode.h \
+		/opt/homebrew/include/SDL2/SDL_scancode.h \
+		/opt/homebrew/include/SDL2/SDL_mouse.h \
+		/opt/homebrew/include/SDL2/SDL_joystick.h \
+		/opt/homebrew/include/SDL2/SDL_guid.h \
+		/opt/homebrew/include/SDL2/SDL_gamecontroller.h \
+		/opt/homebrew/include/SDL2/SDL_sensor.h \
+		/opt/homebrew/include/SDL2/SDL_quit.h \
+		/opt/homebrew/include/SDL2/SDL_gesture.h \
+		/opt/homebrew/include/SDL2/SDL_touch.h \
+		/opt/homebrew/include/SDL2/SDL_filesystem.h \
+		/opt/homebrew/include/SDL2/SDL_haptic.h \
+		/opt/homebrew/include/SDL2/SDL_hidapi.h \
+		/opt/homebrew/include/SDL2/SDL_hints.h \
+		/opt/homebrew/include/SDL2/SDL_loadso.h \
+		/opt/homebrew/include/SDL2/SDL_log.h \
+		/opt/homebrew/include/SDL2/SDL_messagebox.h \
+		/opt/homebrew/include/SDL2/SDL_metal.h \
+		/opt/homebrew/include/SDL2/SDL_power.h \
+		/opt/homebrew/include/SDL2/SDL_render.h \
+		/opt/homebrew/include/SDL2/SDL_shape.h \
+		/opt/homebrew/include/SDL2/SDL_system.h \
+		/opt/homebrew/include/SDL2/SDL_timer.h \
+		/opt/homebrew/include/SDL2/SDL_version.h \
+		/opt/homebrew/include/SDL2/SDL_locale.h \
+		/opt/homebrew/include/SDL2/SDL_misc.h \
+		/opt/homebrew/include/SDL2/SDL_image.h \
+		game_utils.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o credits.o src/credits.cpp
 
 gamepad.o: src/gamepad.cpp src/gamepad.h \
 		/opt/homebrew/include/SDL2/SDL.h \
@@ -1257,7 +1372,7 @@ main.o: main.cpp /opt/homebrew/include/SDL2/SDL.h \
 		/opt/homebrew/include/SDL2/SDL_locale.h \
 		/opt/homebrew/include/SDL2/SDL_misc.h \
 		/opt/homebrew/include/SDL2/SDL_image.h \
-		src/gamepad.h
+		game_utils.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 ####### Install
