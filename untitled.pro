@@ -140,6 +140,31 @@ linux {
     QMAKE_CXXFLAGS += -DLINUX_ARM64
 }
 
+# Windows-specific settings (amd64)
+win32:amd64 {
+    QMAKE_WINDOWS_DEPLOYMENT_TARGET = win11
+    INCLUDEPATH += C:/path/to/SDL2/include
+    LIBS += \
+        -LC:/path/to/SDL2/lib \
+        -lSDL2 \
+        -lSDL2_image \
+        -lopengl32
+    QMAKE_CXXFLAGS += -DWINDOWS_AMD64
+}
+
+# Linux-specific settings (amd64)
+linux:amd64 {
+    INCLUDEPATH += /usr/include/SDL2
+    LIBS += \
+        -L/usr/lib/x86_64-linux-gnu \
+        -lSDL2 \
+        -lSDL2_image \
+        -lGL \
+        -lEGL
+    QMAKE_CXXFLAGS += -DLINUX_AMD64
+}
+
+
 
 # General Compilation Flags
 QMAKE_CFLAGS += -fobjc-arc
