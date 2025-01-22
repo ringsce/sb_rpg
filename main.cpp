@@ -1,4 +1,3 @@
-// main.cpp
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
@@ -7,16 +6,34 @@
 // Platform-specific includes for cross-platform support
 #if defined(__ANDROID__)
 #include <GLES2/gl2.h>  // OpenGL ES for Android
+
 #elif defined(__APPLE__) && !defined(__IOS__)
 #include <OpenGL/gl.h>  // OpenGL for macOS
 #include <OpenGL/glu.h>
 #define GL_SILENCE_DEPRECATION
+
 #elif defined(__IOS__)
 #include <OpenGLES/ES2/gl.h>  // OpenGL ES for iOS
-#elif defined(__linux__)
+
+#elif defined(__linux__) && defined(__aarch64__)
 #include <GLES2/gl2.h>  // OpenGL ES for Linux ARM64
-#elif defined(_WIN32)
-#include <GLES2/gl2.h>  // OpenGL ES for Windows ARM64
+
+#elif defined(__linux__) && defined(__x86_64__)
+#include <GL/gl.h>  // OpenGL for Linux AMD64
+#include <GL/glu.h>
+
+#elif defined(__linux__) && defined(__i386__)
+#include <GL/gl.h>  // OpenGL for Linux x86
+#include <GL/glu.h>
+
+#elif defined(_WIN32) && defined(_M_X64)
+#include <GL/gl.h>  // OpenGL for Windows AMD64
+#include <GL/glu.h>
+
+#elif defined(_WIN32) && defined(_M_IX86)
+#include <GL/gl.h>  // OpenGL for Windows x86
+#include <GL/glu.h>
+
 #endif
 
 struct Button {
