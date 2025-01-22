@@ -1,8 +1,13 @@
 #-------------------------------------------------
 #
 # Project created by QtCreator 2012-08-06T14:25:21
+# Modified by KDI at 2025-22-01-11:25
 #
 #-------------------------------------------------
+
+# Deployment Target and Mode
+APPLE_DEPLOYMENT_TARGET = 11.0
+APPLE_DEPLOYMENT_MODE = release
 
 QT       += core gui network
 

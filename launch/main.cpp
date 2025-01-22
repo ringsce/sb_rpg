@@ -23,10 +23,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <QApplication>
 #include "mainwindow.h"
 
+// Platform-specific includes
+#if defined(_WIN32) && defined(_M_AMD64)
+#include <windows.h>
+#pragma message("Compiling for Windows 11 AMD64")
+#elif defined(__linux__) && defined(__x86_64__)
+#include <unistd.h>
+#pragma message("Compiling for Linux AMD64")
+#elif defined(__linux__) && defined(__aarch64__)
+#include <unistd.h>
+#pragma message("Compiling for Linux ARM64")
+#elif defined(__APPLE__) && defined(__aarch64__)
+#include <TargetConditionals.h>
+#if TARGET_OS_MAC
+#include <unistd.h>
+#pragma message("Compiling for macOS ARM64")
+#endif
+#else
+#error "Unsupported platform or architecture"
+#endif
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ioLaunch w;
+// Platform-specific messages
+#if defined(_WIN32) && defined(_M_AMD64)
+    w.setWindowTitle("App - Windows 11 AMD64");
+#elif defined(__linux__) && defined(__x86_64__)
+    w.setWindowTitle("App - Linux AMD64");
+#elif defined(__linux__) && defined(__aarch64__)
+    w.setWindowTitle("App - Linux ARM64");
+#elif defined(__APPLE__) && defined(__aarch64__)
+    w.setWindowTitle("App - macOS ARM64");
+#else
+    w.setWindowTitle("App - Unsupported Platform");
+#endif
+
     w.show();
     
     return a.exec();
