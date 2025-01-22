@@ -32,7 +32,7 @@ QString FileUtils::uniqueFilename(const QString &filename)
     for (;;)
     {
         QFileInfo fi(filename);
-        unique = fi.path() + QString("/") + QString::number(qrand(), 16) + QString("_") + fi.fileName();
+        unique = fi.path() + QString("/") + QString::number(rand(), 16) + QString("_") + fi.fileName();
 
         if (!QFile::exists(unique))
             break;
@@ -73,7 +73,7 @@ FileCopyWorker::FileCopyWorker(const QList<FileOperation> &files) : files(files)
 
 void FileCopyWorker::copy()
 {
-    qsrand(time(NULL));
+    srand(time(NULL));
 
     for (int i = 0; i < files.size(); i++)
     {

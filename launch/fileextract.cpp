@@ -33,7 +33,7 @@ FileExtractWorker::FileExtractWorker(const QString &archiveFilename, const QList
 
 void FileExtractWorker::extract()
 {
-    qsrand(time(NULL));
+    srand(time(NULL));
 
 #ifdef Q_OS_WIN32
     archiveFilename = archiveFilename.replace('/', '\\');

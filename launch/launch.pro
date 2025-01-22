@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = launch
 TEMPLATE = app
 
+# Skip SDK Version Check
+CONFIG += sdk_no_version_check
 
 SOURCES += main.cpp\
         mainwindow.cpp \
