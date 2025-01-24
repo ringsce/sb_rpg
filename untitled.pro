@@ -22,7 +22,7 @@ SOURCES += \
     src/credits.cpp \
     src/gamepad.cpp \
     main.cpp
-    #srv/serverRegistration.cpp
+    srv/serverRegistration.cpp
 
 # Distribution Files
 DISTFILES += \
