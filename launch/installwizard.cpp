@@ -29,6 +29,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "installwizard_patch.h"
 #include "installwizard_finished.h"
 #include "settings.h"
+#include "ui_installwizard.h"
+
 
 InstallWizard::InstallWizard(QWidget *parent, Settings *settings) :
     QWizard(parent),

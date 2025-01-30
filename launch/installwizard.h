@@ -25,6 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <QWizard>
 #include "filecopy.h"
+#include "ui_installwizard.h"
 
 namespace Ui {
 class InstallWizard;
@@ -65,12 +66,13 @@ private slots:
     void finished(int result);
 
 private:
-    Ui::InstallWizard *ui;
+    //Ui::InstallWizard *ui;
     QPushButton *cancelButton;
     Settings *settings;
     QList<FileOperation> fileCopyOperations;
     bool isQuake3PatchRequired;
     QString quakePath;
+    std::unique_ptr<Ui::InstallWizard> ui;
 };
 
 #endif // INSTALLWIZARD_H

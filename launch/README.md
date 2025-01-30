@@ -1,57 +1,93 @@
-THE AS OF YET NOT OFFICIALLY NAMED LAUNCHER FOR IOQ3
-====================================================
+# Samurai Babel Launcher for ioquake3
 
-The launcher for ioquake3. Built with QT, written in C++. 
+## Overview
+The Samurai Babel Launcher is an innovative take on the ioquake3 launcher, designed with modern gaming needs in mind. Developed with QT and written in C++, this launcher aims to streamline updates, enhance user accessibility, and support multiple operating systems for ioquake3 and compatible games.
 
-This project's goal as an updater is to get everyone on Windows, OS X, and Linux onto modern versions of ioquake3, and keep them up-to-date in a style similar to other stand-alone launcher/updater systems for games that aren't on major digital-distribution platforms.
+## Vision
+This project seeks to unify the ioquake3 experience by:
+- Providing a seamless update system across Windows, macOS, and Linux.
+- Making ioquake3’s advanced features easily accessible to players.
+- Supporting standalone mods and encapsulated games with integrated update mechanisms.
+- Enabling advanced functionality like configuration management, server browsing, and mod preloading.
 
-As a launcher this project should enable easy access to ioquake3 features that are otherwise buried in wikis, forums, and README files.
+---
 
-Future goals could include the ability to launch an encapsulated mod for quake 3 or standalone games and keep them updated and on the latest versions of ioquake3 as well.
+## Features and Roadmap
 
-Building
-=====
-Instructions are available for compiling launch here:
-http://wiki.ioquake3.org/Building_launch
+### Required Features
 
-ROADMAP
-=======
+#### Version 0.1 (Alpha)
+- [x] Launch the ioquake3 program.
+- [x] Launch ioquake3 at different resolutions.
+- [ ] Download and install patches for Quake 3.
+- [ ] Display EULA before downloading patches.
 
-Required features to reach:
----------------------------
+#### Version 0.5 (Beta)
+- [ ] Download and install ioquake3.
+- [ ] Copy Quake 3 data from a retail CD.
+- [ ] Update ioquake3.
+- [ ] Self-update capability.
+- [ ] Initial support for other operating systems (Linux support started).
 
-Version 0.1 (alpha)
+#### Version 1.0
+- [ ] Configure launch options.
+- [ ] Configure player options.
+- [ ] WYSIWYG name configuration.
+- [ ] Integration with Steam and GOG versions of Quake 3.
+- [ ] Backup, save, and swap configurations.
+- [ ] Full support for Linux, Windows, and macOS.
 
-  * launch the ioquake3 program - DONE
-  * launch quake3 at different resolutions - DONE
-  * download/install patches for quake3 - not yet implemented
-  * display EULA before downloading q3 patches - not yet implemented
+#### Version 2.0
+- [ ] Support for additional games (e.g., Tremulous, Smokin' Guns, Turtle Arena).
+- [ ] Automated mod switching.
+- [ ] Built-in server browser.
+- [ ] Integrated news feed.
+- [ ] LAN support.
+- [ ] Preload mods, maps, and content via internet protocols.
+- [ ] URI integration (e.g., `q3://`, `trem://`, `ioq3://`).
+- [ ] RCON interface for remote server management.
 
+---
 
-0.5 (beta)
+## Building the Launcher
 
-  * be able to download/install ioquake3
-  * be able to copy quake3 data from retail CD
-  * be able to update ioquake3
-  * be able to update self
-  * initial support for other operating systems - STARTED(Linux)
+### Prerequisites
+- **Qt Framework**: Ensure QT is installed for your platform.
+- **C++ Compiler**: Use GCC, Clang, or MSVC as appropriate for your OS.
+- **Git**: Clone the repository.
 
-1.0
+### Instructions
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/ringsce/samurai_babel_launcher.git
+   cd samurai_babel_launcher
+   ```
 
-  * config launch options
-  * config player options
-  * WYSIWYG name config
-  * work with steam/gog installation of quake3
-  * backup/save/swap configs
-  * support for Linux, Windows, and OS X
+2. **Build the Project**
+   - **On Linux/MacOS**:
+     ```bash
+     qmake
+     make
+     ```
+   - **On Windows**:
+     ```cmd
+     qmake
+     nmake
+     ```
 
-2.0
+3. **Run the Launcher**
+   Execute the built binary from the `build/` directory.
 
-  * support for other games (Tremulous/SmokinGuns/TurtleArena/etc.)
-  * automated mod switcher
-  * builtin server browser
-  * integrated newsfeed
-  * LAN support
-  * preload mods/maps/content via internet protocols
-  * uri integration (q3://, trem://, ioq3://, etc.)
-  * rcon interface for remote servers
+---
+
+## Advanced Goals
+- **Inspired by Samurai Babel**:
+  The launcher incorporates concepts from the *Samurai Babel* framework, focusing on modularity and cross-platform compatibility.
+
+- **Future Expansion**:
+  The Samurai Babel Launcher will evolve to support new games and features, ensuring it remains a vital tool for ioquake3 and beyond.
+
+---
+
+For further details and updates, visit the [official GitHub repository](https://github.com/ringsce/samurai_babel_launcher).
+
