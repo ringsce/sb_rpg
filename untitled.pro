@@ -16,10 +16,11 @@ QT += sql
 
 # Source Files
 SOURCES += \
-    api.cpp \
     game_utils.cpp \
     src/ai.cpp \
+    src/api.cpp \
     src/camera.cpp \
+    src/commands.cpp \
     src/credits.cpp \
     src/gamepad.cpp \
     main.cpp
@@ -27,6 +28,7 @@ SOURCES += \
 
 # Distribution Files
 DISTFILES += \
+    CMakeLists.txt \
     Makefile \
     MetalRenderer.m
 
@@ -176,7 +178,8 @@ QMAKE_LFLAGS += -fobjc-arc
 CONFIG += release
 
 HEADERS += \
-    api.h \
     game_utils.h \
     src/ai.h update \
+    src/api.h \
+    src/commands.h \
     src/gamepad.h
