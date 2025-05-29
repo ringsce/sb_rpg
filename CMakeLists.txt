@@ -102,7 +102,8 @@ endif()
 # Build target
 if(APPLE AND MACOSX_BUNDLE)
     # macOS bundle
-    set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns ../base)
+    set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns ../base
+            src/game_utils.h)
     source_group("Resources" FILES ${MACOS_RESOURCES})
     set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
