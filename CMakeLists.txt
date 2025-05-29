@@ -1,8 +1,24 @@
 cmake_minimum_required(VERSION 3.16)
-project(SamuraiBabel)
+if(NOT DEFINED APP_NAME)
+    # RB: This sets the name of the .exe and is the only line needed for a different mod executable.
+    # If you want to make a different game then you also need to change neo/framework/Licensee.h
+    set(APP_NAME valkyrie)
+endif()
+project(${APP_NAME})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.6")
+    # set MSVC startup project
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
+endif()
+
+option(STANDALONE
+        "Skip DOOM-3-BFG base/ folder and use content/ instead" ON)
 
 # Deployment Target (macOS/iOS)
 if(APPLE)
@@ -90,3 +106,61 @@ endif()
 # Add executable
 add_executable(SamuraiBabel ${SOURCES} ${HEADERS})
 target_link_libraries(SamuraiBabel ${LIBS})
+
+if(OPENAL)
+    add_definitions(-DUSE_OPENAL)
+
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/include)
+
+    if(CMAKE_CL_64)
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/lib/win64)
+    else()
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/openal-soft/lib/win32)
+    endif()
+
+    list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
+    list(APPEND RBDOOM3_SOURCES	${OPENAL_SOURCES})
+
+    set(OpenAL_LIBRARIES
+            OpenAL32)
+    if(CMAKE_CL_64)
+        install(FILES libs/openal-soft/lib/bin/win64/OpenAL32.dll DESTINATION .)
+    else()
+        install(FILES libs/openal-soft/lib/bin/win32/OpenAL32.dll DESTINATION .)
+        install(FILES libs/openal-soft/lib/bin/win32/OpenAL32.pdb DESTINATION .)
+    endif()
+else()
+    list(APPEND RBDOOM3_INCLUDES ${XAUDIO2_INCLUDES})
+    list(APPEND RBDOOM3_SOURCES	${XAUDIO2_SOURCES})
+
+    if(DOOM_CLASSIC)
+        list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_XAUDIO2_SOURCES})
+    endif()
+endif()
+
+
+if(MACOSX_BUNDLE)
+    # define contents of macOS app bundle Resources folder
+    set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns ../base)
+    source_group("Resources" FILES ${MACOS_RESOURCES})
+    set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+    # enable Xcode to display the icons file properly
+    set_source_files_properties(sys/posix/res/Valkyrie.icns PROPERTIES XCODE_EXPLICIT_FILE_TYPE .icns)
+
+    # add macOS bundle properties to executable
+    set(MACOSX_BUNDLE_BUNDLE_NAME valkyrie)
+    set(MACOSX_BUNDLE_BUNDLE_VERSION 1.0.0)
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING 1.0.0)
+    set(MACOSX_BUNDLE_ICON_FILE Doom3BFG.icns)
+    set(MACOSX_BUNDLE_INFO_STRING "")					# to be added by author if desired
+    set(MACOSX_BUNDLE_COPYRIGHT "")						# to be added by author if desired
+
+    add_executable(${APP_NAME} MACOSX_BUNDLE ${MACOS_RESOURCES} ${VALKYRIE_INCLUDES} ${VALKYRIE_SOURCES})
+else()
+    add_executable(${APP_NAME} WIN32 ${VALKYRIE_INCLUDES} ${VALKYRIE_SOURCES})
+endif()
+
+if(USE_VULKAN)
+    add_dependencies(${APP_NAME} nvrhi_vk)
+endif()
