@@ -22,7 +22,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.6")
 endif()
 
 # Option to use standalone content
-option(STANDALONE "Skip DOOM-3-BFG base/ folder and use content/ instead" ON)
+option(STANDALONE "Skip Valkyrie base/ folder and use content/ instead" ON)
 
 # Source and header files
 set(VALKYRIE_SOURCES
