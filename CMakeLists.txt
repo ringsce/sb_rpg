@@ -196,14 +196,55 @@ endif()
 # Link all collected libraries
 target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
 
-if(APPLE)
-    find_library(METAL_FRAMEWORK Metal)
-    find_library(METALKIT_FRAMEWORK MetalKit)
-    find_library(FOUNDATION_FRAMEWORK Foundation)
+if(APPLE AND NOT TVOS)
+        set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns)
+        set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
+        set(MACOSX_BUNDLE_BUNDLE_VERSION 1.0.0)
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING 1.0.0)
+        set(MACOSX_BUNDLE_ICON_FILE Valkyrie.icns)
 
-    target_link_libraries(${APP_NAME} PRIVATE
-            ${METAL_FRAMEWORK}
-            ${METALKIT_FRAMEWORK}
-            ${FOUNDATION_FRAMEWORK}
-    )
+        add_executable(${APP_NAME} MACOSX_BUNDLE ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${MACOS_RESOURCES})
+    else()
+        add_executable(${APP_NAME} ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES})
+        # Find and link Apple frameworks
+        find_library(METAL_FRAMEWORK Metal)
+        find_library(METALKIT_FRAMEWORK MetalKit)
+        find_library(FOUNDATION_FRAMEWORK Foundation)
+        find_library(QUARTZCORE_FRAMEWORK QuartzCore)
+
+        target_link_libraries(${APP_NAME} PRIVATE
+                ${METAL_FRAMEWORK}
+                ${METALKIT_FRAMEWORK}
+                ${FOUNDATION_FRAMEWORK}
+                ${QUARTZCORE_FRAMEWORK}
+        )
+
+endif()
+
+
+if(WIN32)
+    message(STATUS "Configuring for Windows...")
+
+    # Optional: Define a macro for Windows platform
+    add_definitions(-DPLATFORM_WINDOWS)
+
+    # Optional: Set Windows 11 compatibility manifest
+    set(WIN32_MANIFEST "${CMAKE_SOURCE_DIR}/sys/windows/app.manifest")
+    set_source_files_properties(${WIN32_MANIFEST} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+    # Set executable to be a Windows GUI app (no console)
+    add_executable(${APP_NAME} WIN32 ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${WIN32_MANIFEST})
+endif()
+
+#MSVC Studio
+if(MSVC)
+    set(CMAKE_SYSTEM_VERSION 10.0.22621.0) # Windows 11 SDK
+endif()
+
+
+if(WIN32)
+    find_library(DXGI_LIBRARY dxgi)
+    find_library(D3D12_LIBRARY d3d12)
+    target_link_libraries(${APP_NAME} PRIVATE ${DXGI_LIBRARY} ${D3D12_LIBRARY})
 endif()
