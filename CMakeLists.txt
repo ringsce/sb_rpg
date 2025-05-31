@@ -193,4 +193,17 @@ if(USE_VULKAN)
 endif()
 
 # Link all collected libraries
+# Link all collected libraries
 target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
+
+if(APPLE)
+    find_library(METAL_FRAMEWORK Metal)
+    find_library(METALKIT_FRAMEWORK MetalKit)
+    find_library(FOUNDATION_FRAMEWORK Foundation)
+
+    target_link_libraries(${APP_NAME} PRIVATE
+            ${METAL_FRAMEWORK}
+            ${METALKIT_FRAMEWORK}
+            ${FOUNDATION_FRAMEWORK}
+    )
+endif()
