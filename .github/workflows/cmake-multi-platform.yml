@@ -1,0 +1,93 @@
+name: sb_rpg workflow
+
+on:
+  push:
+    branches: [ "main" ] # Triggers on updates to main
+  pull_request:
+    branches: [ "main" ] # Also runs build/test on PRs
+
+jobs:
+  build:
+    runs-on: macos-latest # This runner defaults to ARM64
+    matrix:
+      # Set up a matrix to explicitly run only the macOS ARM64 configuration
+      include:
+        - os: macos-latest
+          c_compiler: clang
+          arch: arm64
+        - os: linux
+          c_compiler: gcc
+          arch: arm64
+        - os: windows
+          c_compiler: none
+          arch: x64
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory.
+      # We set the C compiler from the matrix and hardcode the Build Type as Release.
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=Release
+        -S ${{ github.workspace }}
+
+    - name: Build
+      # Build your program with the Release configuration.
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
+
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      # Execute tests defined by the CMake configuration.
+      run: ctest --build-config Release
+
+    - name: Upload macOS Artifact (for CI run)
+      # This step is still useful for PRs and internal CI logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: kcc-macos-arm64
+        path: ${{ steps.strings.outputs.build-output-dir }}/kcc
+        tags: [ "latest" ]
+
+    - name: Package binary for release
+      # This step only runs on pushes to main, not on Pull Requests
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      shell: bash
+      run: |
+        cd ${{ steps.strings.outputs.build-output-dir }}
+        zip kcc-macos-arm64.zip kcc
+        echo "ASSET_PATH=${{ steps.strings.outputs.build-output-dir }}/kcc-macos-arm64.zip" >> "$GITHUB_ENV"
+
+    - name: Delete existing 'latest' release and tag
+      # This step only runs on pushes to main, not on Pull Requests
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Delete the release. This also removes the 'latest' tag from the release list.
+        git push origin --delete latest || echo "No 'latest' release found to delete."
+        # Delete the underlying git tag
+        git push origin --delete latest || echo "No 'latest' tag found to delete."
+
+    - name: Create new 'latest' release
+      # This step only runs on pushes to main, not on Pull Requests
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest # Creates a new tag "latest" pointing to this commit
+        name: Latest Build (macOS ARM64)
+        body: "Automated build from the latest commit on main (${{ github.sha }}). This is a pre-release build."
+        run: |
+          # Test the new release
+          ctest --build-config Release
+          # Test the new tag
+          git tag -d latest

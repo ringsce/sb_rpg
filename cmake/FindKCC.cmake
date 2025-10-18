@@ -1,6 +1,9 @@
 # FindKCC.cmake
 # Finds the Kayte C Compiler (KCC) for Samurai Babel RPG
 #
+# This module will first try to find a system-installed KCC.
+# If not found, it will fetch and build KCC from GitHub.
+#
 # This module defines:
 #  KCC_FOUND - System has KCC
 #  KCC_EXECUTABLE - The KCC compiler executable
@@ -8,14 +11,20 @@
 #  KCC_INCLUDE_DIR - The KCC include directory
 #  KCC_LIBRARY_DIR - The KCC library directory
 #  KCC_LIBRARIES - The KCC runtime libraries
+#  KCC::Runtime - Imported library target for KCC runtime
+#  kcc_compile_files() - Function to compile .kcc files
 #
 # Usage:
 #   find_package(KCC REQUIRED)
 #   if(KCC_FOUND)
-#       kcc_compile(output_file input_file)
+#       kcc_compile_files(output_var input_file1 ...)
 #   endif()
 
 cmake_minimum_required(VERSION 3.16)
+include(FetchContent)
+include(FindPackageHandleStandardArgs)
+
+# --- 1. Try to find KCC locally ---
 
 # Set paths to search for KCC
 set(KCC_SEARCH_PATHS
@@ -75,7 +84,6 @@ if(KCC_EXECUTABLE)
     )
 
     if(KCC_VERSION_RESULT EQUAL 0)
-        # Try to extract version from output
         string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" KCC_VERSION "${KCC_VERSION_OUTPUT}")
         if(NOT KCC_VERSION)
             string(REGEX MATCH "[0-9]+\\.[0-9]+" KCC_VERSION "${KCC_VERSION_OUTPUT}")
@@ -87,36 +95,94 @@ if(KCC_EXECUTABLE)
     endif()
 endif()
 
-# Set KCC_LIBRARIES
 if(KCC_RUNTIME_LIBRARY)
     set(KCC_LIBRARIES ${KCC_RUNTIME_LIBRARY})
 endif()
 
-# Handle REQUIRED and QUIET arguments
-include(FindPackageHandleStandardArgs)
+# Store find_package arguments
+set(_KCC_FIND_QUIETLY ${KCC_FIND_QUIETLY})
+set(_KCC_FIND_REQUIRED ${KCC_FIND_REQUIRED})
+
+# Run an initial check to see if local find succeeded
 find_package_handle_standard_args(KCC
-        REQUIRED_VARS KCC_EXECUTABLE
+        REQUIRED_VARS KCC_EXECUTABLE KCC_RUNTIME_LIBRARY
         VERSION_VAR KCC_VERSION
-        FAIL_MESSAGE "Could not find Kayte C Compiler (KCC). Set KCC_ROOT to the installation directory."
+        HANDLE_COMPONENTS
+        FAIL_MESSAGE "Could not find Kayte C Compiler (KCC)."
 )
 
-# Mark variables as advanced
-mark_as_advanced(
-        KCC_EXECUTABLE
-        KCC_INCLUDE_DIR
-        KCC_LIBRARY_DIR
-        KCC_RUNTIME_LIBRARY
-)
+set(KCC_FOUND_LOCALLY ${KCC_FOUND})
 
-# Create imported target if found
-if(KCC_FOUND AND NOT TARGET KCC::KCC)
-    add_executable(KCC::KCC IMPORTED)
-    set_target_properties(KCC::KCC PROPERTIES
-            IMPORTED_LOCATION "${KCC_EXECUTABLE}"
+# --- 2. If not found locally, fetch from GitHub ---
+
+if(NOT KCC_FOUND_LOCALLY)
+    if(NOT _KCC_FIND_QUIETLY)
+        message(STATUS "KCC not found locally. Fetching from GitHub...")
+    endif()
+
+    FetchContent_Declare(
+            KCC # Name of the content
+            GIT_REPOSITORY https://www.github.com/ringsce/kcc.git
+            GIT_TAG main # WARNING: Recommend pinning to a specific commit/tag
     )
 
-    # Create interface library for runtime
-    if(KCC_RUNTIME_LIBRARY)
+    # This downloads, configures, and builds KCC as a sub-project.
+    # We assume this sub-project defines:
+    # 1. Target KCC::Runtime
+    # 2. Function kcc_compile_files()
+    FetchContent_MakeAvailable(KCC)
+
+    # After fetching, check if the required components are now available
+    if(COMMAND kcc_compile_files AND TARGET KCC::Runtime)
+        set(KCC_FOUND TRUE) # Manually set KCC_FOUND
+
+        # Manually populate the variables this module is expected to set
+        if(TARGET KCC::KCC)
+            set(KCC_EXECUTABLE $<TARGET_FILE:KCC::KCC>)
+        endif()
+
+        set(KCC_RUNTIME_LIBRARY KCC::Runtime) # Use the target name
+        set(KCC_LIBRARIES KCC::Runtime)
+        get_target_property(KCC_INCLUDE_DIR KCC::Runtime INTERFACE_INCLUDE_DIRECTORIES)
+
+        # Try to get version from subproject
+        if(NOT KCC_VERSION AND DEFINED KCC_VERSION)
+            # KCC_VERSION might have been set by the subproject
+        else()
+            set(KCC_VERSION "fetched") # Fallback
+        endif()
+
+        if(NOT _KCC_FIND_QUIETLY)
+            message(STATUS "Found KCC: Fetched from GitHub (version ${KCC_VERSION})")
+            message(STATUS "  KCC include dir: ${KCC_INCLUDE_DIR}")
+            message(STATUS "  KCC runtime: ${KCC_RUNTIME_LIBRARY}")
+        endif()
+
+    else()
+        # Fetching failed or didn't provide required targets
+        set(KCC_FOUND FALSE)
+    endif()
+endif() # End of fetch block
+
+# --- 3. Define local targets/functions (ONLY if found locally) ---
+
+if(KCC_FOUND_LOCALLY)
+
+    mark_as_advanced(
+            KCC_EXECUTABLE
+            KCC_INCLUDE_DIR
+            KCC_LIBRARY_DIR
+            KCC_RUNTIME_LIBRARY
+    )
+
+    if(KCC_FOUND AND NOT TARGET KCC::KCC)
+        add_executable(KCC::KCC IMPORTED)
+        set_target_properties(KCC::KCC PROPERTIES
+                IMPORTED_LOCATION "${KCC_EXECUTABLE}"
+        )
+    endif()
+
+    if(KCC_RUNTIME_LIBRARY AND NOT TARGET KCC::Runtime)
         add_library(KCC::Runtime UNKNOWN IMPORTED)
         set_target_properties(KCC::Runtime PROPERTIES
                 IMPORTED_LOCATION "${KCC_RUNTIME_LIBRARY}"
@@ -127,83 +193,81 @@ if(KCC_FOUND AND NOT TARGET KCC::KCC)
             )
         endif()
     endif()
-endif()
 
-# Function to compile KCC source files
-function(kcc_compile OUTPUT_VAR INPUT_FILE)
-    if(NOT KCC_FOUND)
-        message(FATAL_ERROR "KCC not found. Cannot compile ${INPUT_FILE}")
+    if(NOT COMMAND kcc_compile)
+        function(kcc_compile OUTPUT_VAR INPUT_FILE)
+            if(NOT KCC_FOUND)
+                message(FATAL_ERROR "KCC not found. Cannot compile ${INPUT_FILE}")
+            endif()
+
+            set(options VERBOSE)
+            set(oneValueArgs OUTPUT_DIR)
+            set(multiValueArgs FLAGS INCLUDES DEFINES)
+            cmake_parse_arguments(KCC_COMPILE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+            get_filename_component(INPUT_NAME ${INPUT_FILE} NAME_WE)
+            get_filename_component(INPUT_EXT ${INPUT_FILE} EXT)
+
+            if(KCC_COMPILE_OUTPUT_DIR)
+                set(OUTPUT_FILE "${KCC_COMPILE_OUTPUT_DIR}/${INPUT_NAME}.o")
+            else()
+                set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${INPUT_NAME}.o")
+            endif()
+
+            set(COMPILE_FLAGS "")
+
+            foreach(inc ${KCC_COMPILE_INCLUDES})
+                list(APPEND COMPLATE_FLAGS "-I${inc}")
+            endforeach()
+
+            foreach(def ${KCC_COMPILE_DEFINES})
+                list(APPEND COMPILE_FLAGS "-D${def}")
+            endforeach()
+
+            list(APPEND COMPILE_FLAGS ${KCC_COMPILE_FLAGS})
+
+            add_custom_command(
+                    OUTPUT ${OUTPUT_FILE}
+                    COMMAND ${KCC_EXECUTABLE} ${COMPILE_FLAGS} -c ${INPUT_FILE} -o ${OUTPUT_FILE}
+                    DEPENDS ${INPUT_FILE}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    COMMENT "Compiling KCC source: ${INPUT_FILE}"
+                    VERBATIM
+            )
+
+            set(${OUTPUT_VAR} ${OUTPUT_FILE} PARENT_SCOPE)
+        endfunction()
     endif()
 
-    # Parse optional arguments
-    set(options VERBOSE)
-    set(oneValueArgs OUTPUT_DIR)
-    set(multiValueArgs FLAGS INCLUDES DEFINES)
-    cmake_parse_arguments(KCC_COMPILE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if(NOT COMMAND kcc_compile_files)
+        function(kcc_compile_files OUTPUT_VAR)
+            set(OUTPUT_FILES "")
 
-    # Get input file name without extension
-    get_filename_component(INPUT_NAME ${INPUT_FILE} NAME_WE)
-    get_filename_component(INPUT_EXT ${INPUT_FILE} EXT)
+            foreach(input_file ${ARGN})
+                kcc_compile(compiled_file ${input_file})
+                list(APPEND OUTPUT_FILES ${compiled_file})
+            endforeach()
 
-    # Set output file
-    if(KCC_COMPILE_OUTPUT_DIR)
-        set(OUTPUT_FILE "${KCC_COMPILE_OUTPUT_DIR}/${INPUT_NAME}.o")
-    else()
-        set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${INPUT_NAME}.o")
+            set(${OUTPUT_VAR} ${OUTPUT_FILES} PARENT_SCOPE)
+        endfunction()
     endif()
 
-    # Build compiler flags
-    set(COMPILE_FLAGS "")
-
-    # Add includes
-    foreach(inc ${KCC_COMPILE_INCLUDES})
-        list(APPEND COMPILE_FLAGS "-I${inc}")
-    endforeach()
-
-    # Add defines
-    foreach(def ${KCC_COMPILE_DEFINES})
-        list(APPEND COMPILE_FLAGS "-D${def}")
-    endforeach()
-
-    # Add user flags
-    list(APPEND COMPILE_FLAGS ${KCC_COMPILE_FLAGS})
-
-    # Add custom command to compile
-    add_custom_command(
-            OUTPUT ${OUTPUT_FILE}
-            COMMAND ${KCC_EXECUTABLE} ${COMPILE_FLAGS} -c ${INPUT_FILE} -o ${OUTPUT_FILE}
-            DEPENDS ${INPUT_FILE}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMENT "Compiling KCC source: ${INPUT_FILE}"
-            VERBATIM
-    )
-
-    # Return output file
-    set(${OUTPUT_VAR} ${OUTPUT_FILE} PARENT_SCOPE)
-endfunction()
-
-# Function to compile multiple KCC files
-function(kcc_compile_files OUTPUT_VAR)
-    set(OUTPUT_FILES "")
-
-    foreach(input_file ${ARGN})
-        kcc_compile(compiled_file ${input_file})
-        list(APPEND OUTPUT_FILES ${compiled_file})
-    endforeach()
-
-    set(${OUTPUT_VAR} ${OUTPUT_FILES} PARENT_SCOPE)
-endfunction()
-
-# Print status if found
-if(KCC_FOUND)
-    message(STATUS "Found KCC: ${KCC_EXECUTABLE} (version ${KCC_VERSION})")
-    if(KCC_INCLUDE_DIR)
-        message(STATUS "  KCC include dir: ${KCC_INCLUDE_DIR}")
+    if(KCC_FOUND AND NOT _KCC_FIND_QUIETLY)
+        message(STATUS "Found KCC: ${KCC_EXECUTABLE} (version ${KCC_VERSION})")
+        if(KCC_INCLUDE_DIR)
+            message(STATUS "  KCC include dir: ${KCC_INCLUDE_DIR}")
+        endif()
+        if(KCC_LIBRARY_DIR)
+            message(STATUS "  KCC library dir: ${KCC_LIBRARY_DIR}")
+        endif()
+        if(KCC_RUNTIME_LIBRARY)
+            message(STATUS "  KCC runtime: ${KCC_RUNTIME_LIBRARY}")
+        endif()
     endif()
-    if(KCC_LIBRARY_DIR)
-        message(STATUS "  KCC library dir: ${KCC_LIBRARY_DIR}")
-    endif()
-    if(KCC_RUNTIME_LIBRARY)
-        message(STATUS "  KCC runtime: ${KCC_RUNTIME_LIBRARY}")
-    endif()
+endif() # End of KCC_FOUND_LOCALLY block
+
+# --- 4. Final failure check ---
+
+if(NOT KCC_FOUND AND _KCC_FIND_REQUIRED)
+    message(FATAL_ERROR "Could not find or fetch KCC. Set KCC_ROOT, install KCC, or check network access.")
 endif()
