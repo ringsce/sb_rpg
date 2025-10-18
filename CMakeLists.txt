@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set macOS deployment target
 if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0")
 
     # Detect and set architecture
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" OR CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
