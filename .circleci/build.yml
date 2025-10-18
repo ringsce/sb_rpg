@@ -1,0 +1,73 @@
+repo: GitHub.com/ringsce/sb_rpg
+branch: main
+
+jobs:
+  build:
+    runs-on: macos-latest
+    matrix:
+      os:
+        - windows
+        - linux
+        - macos
+        - android
+      arch:
+        - arm64
+        - arm
+        - x64
+      tags:
+        - latest
+    steps:
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Configure CMake
+        id: cmake
+        shell: bash
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ github.workspace }}
+
+      - name: Build
+        id: build
+        shell: bash
+        run: |
+          cd ${{ steps.strings.outputs.build-output-dir }}
+          zip kcc-macos-arm64.zip kcc
+          echo "ASSET_PATH=${{ steps.strings.outputs.build-output-dir }}/kcc-macos-arm64.zip" >> "$GITHUB_ENV"
+
+      - name: Test
+        id: test
+        shell: bash
+        run: |
+          ctest --build-config Release
+
+      - name: Upload macOS Artifact (for CI run)
+        id: upload-artifact
+        shell: bash
+        run: |
+          cd ${{ steps.strings.outputs.build-output-dir }}
+          zip kcc-macos-arm64.zip kcc
+          echo "ASSET_PATH=${{ steps.strings.outputs.build-output-dir }}/kcc-macos-arm64.zip" >> "$GITHUB_ENV"
+
+      - name: Delete existing 'latest' release and tag
+        id: delete-tag
+        shell: bash
+        run: |
+          # Delete the release. This also removes the 'latest' tag from the release list.
+          git push origin --delete latest || echo "No 'latest' release found to delete."
+          # Delete the underlying git tag
+          git push origin --delete latest || echo "No 'latest' tag found to delete."
+
+      - name: Create new 'latest' release
+        id: create-tag
+        shell: bash
+        run: |
+          # Test the new release
+          ctest --build-config Release
+          # Test the new tag
+          git tag -d latest
