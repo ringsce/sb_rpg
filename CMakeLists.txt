@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # Set application name
 if(NOT DEFINED APP_NAME)
-    set(APP_NAME valkyrie)
+    set(APP_NAME Valkyrie)
 endif()
 project(${APP_NAME})
 
@@ -11,7 +11,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set macOS deployment target
 if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0")
+
+    # Detect and set architecture
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" OR CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+        set(CMAKE_OSX_ARCHITECTURES "arm64")
+        message(STATUS "Building for Apple Silicon (arm64)")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64" OR CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+        set(CMAKE_OSX_ARCHITECTURES "x86_64")
+        message(STATUS "Building for Intel Mac (x86_64)")
+    else()
+        # Build universal binary if architecture not detected
+        set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+        message(STATUS "Building Universal Binary (arm64 + x86_64)")
+    endif()
 endif()
 
 # CMake IDE and VS settings
@@ -34,7 +47,7 @@ option(ONATIVE                   "Optimize for the host CPU" OFF)
 option(WINDOWS10                 "Build for Windows 10+" ON)
 option(USE_SYSTEM_ZLIB           "Use the system zlib instead of the bundled one" OFF)
 option(USE_SYSTEM_RAPIDJSON      "Use the system rapidjson instead of the bundled one" OFF)
-option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" OFF)
+option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" ON)
 
 if(USE_MoltenVK)
     add_definitions(-DUSE_MOLTENVK)
@@ -60,6 +73,7 @@ set(VALKYRIE_INCLUDES
         src/api.h
         src/commands.h
         src/gamepad.h
+        srv/serverRegistration.h
 )
 
 # SDL2/SDL3
@@ -99,9 +113,6 @@ elseif(APPLE)
     include_directories(/opt/homebrew/include /opt/homebrew/include/SDL3)
     link_directories(/opt/homebrew/lib)
 
-    # Always link Metal 2 and QuartzCore
-    list(APPEND EXTRA_LIBS Metal QuartzCore)
-
     if(USE_MoltenVK)
         message(STATUS "Using MoltenVK as Vulkan backend")
 
@@ -130,8 +141,29 @@ elseif(APPLE)
         list(APPEND EXTRA_LIBS ${Vulkan_LIBRARIES})
     endif()
 
+    # Find and link Apple frameworks (must use find_library for frameworks)
+    find_library(METAL_FRAMEWORK Metal REQUIRED)
+    find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
+    find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
+    find_library(QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
+
     # SDL linking
-    list(APPEND EXTRA_LIBS SDL2 SDL2_image)
+    find_library(SDL2_LIBRARY SDL2 PATHS /opt/homebrew/lib REQUIRED)
+    find_library(SDL2_IMAGE_LIBRARY SDL2_image PATHS /opt/homebrew/lib REQUIRED)
+
+    # Find libcurl
+    find_package(CURL REQUIRED)
+    include_directories(${CURL_INCLUDE_DIRS})
+
+    list(APPEND EXTRA_LIBS
+            ${SDL2_LIBRARY}
+            ${SDL2_IMAGE_LIBRARY}
+            ${METAL_FRAMEWORK}
+            ${METALKIT_FRAMEWORK}
+            ${FOUNDATION_FRAMEWORK}
+            ${QUARTZCORE_FRAMEWORK}
+            ${CURL_LIBRARIES}
+    )
 
 elseif(ANDROID)
     add_definitions(-DGL_ES)
@@ -150,22 +182,6 @@ elseif(UNIX AND NOT APPLE)
         link_directories(/usr/lib/x86_64-linux-gnu)
     endif()
     list(APPEND EXTRA_LIBS SDL2 GL EGL)
-endif()
-
-# macOS bundle support
-if(APPLE AND MACOSX_BUNDLE)
-    set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns ../base)
-    source_group("Resources" FILES ${MACOS_RESOURCES})
-    set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-
-    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
-    set(MACOSX_BUNDLE_BUNDLE_VERSION 1.0.0)
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING 1.0.0)
-    set(MACOSX_BUNDLE_ICON_FILE Valkyrie.icns)
-
-    add_executable(${APP_NAME} MACOSX_BUNDLE ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${MACOS_RESOURCES})
-else()
-    add_executable(${APP_NAME} ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES})
 endif()
 
 # Optional OpenAL
@@ -192,59 +208,101 @@ if(USE_VULKAN)
     add_dependencies(${APP_NAME} nvrhi_vk)
 endif()
 
-# Link all collected libraries
-# Link all collected libraries
-target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
-
-if(APPLE AND NOT TVOS)
-        set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns)
-        set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
-        set(MACOSX_BUNDLE_BUNDLE_VERSION 1.0.0)
-        set(MACOSX_BUNDLE_SHORT_VERSION_STRING 1.0.0)
-        set(MACOSX_BUNDLE_ICON_FILE Valkyrie.icns)
-
-        add_executable(${APP_NAME} MACOSX_BUNDLE ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${MACOS_RESOURCES})
-    else()
-        add_executable(${APP_NAME} ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES})
-        # Find and link Apple frameworks
-        find_library(METAL_FRAMEWORK Metal)
-        find_library(METALKIT_FRAMEWORK MetalKit)
-        find_library(FOUNDATION_FRAMEWORK Foundation)
-        find_library(QUARTZCORE_FRAMEWORK QuartzCore)
-
-        target_link_libraries(${APP_NAME} PRIVATE
-                ${METAL_FRAMEWORK}
-                ${METALKIT_FRAMEWORK}
-                ${FOUNDATION_FRAMEWORK}
-                ${QUARTZCORE_FRAMEWORK}
-        )
-
-endif()
-
-
+# Create executable - single unified location
 if(WIN32)
     message(STATUS "Configuring for Windows...")
-
-    # Optional: Define a macro for Windows platform
     add_definitions(-DPLATFORM_WINDOWS)
 
     # Optional: Set Windows 11 compatibility manifest
     set(WIN32_MANIFEST "${CMAKE_SOURCE_DIR}/sys/windows/app.manifest")
-    set_source_files_properties(${WIN32_MANIFEST} PROPERTIES HEADER_FILE_ONLY TRUE)
+    if(EXISTS ${WIN32_MANIFEST})
+        set_source_files_properties(${WIN32_MANIFEST} PROPERTIES HEADER_FILE_ONLY TRUE)
+    endif()
 
     # Set executable to be a Windows GUI app (no console)
     add_executable(${APP_NAME} WIN32 ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${WIN32_MANIFEST})
-endif()
 
-#MSVC Studio
-if(MSVC)
-    set(CMAKE_SYSTEM_VERSION 10.0.22621.0) # Windows 11 SDK
-endif()
-
-
-if(WIN32)
+    # Link DirectX libraries
     find_library(DXGI_LIBRARY dxgi)
     find_library(D3D12_LIBRARY d3d12)
-    target_link_libraries(${APP_NAME} PRIVATE ${DXGI_LIBRARY} ${D3D12_LIBRARY})
+    if(DXGI_LIBRARY AND D3D12_LIBRARY)
+        list(APPEND EXTRA_LIBS ${DXGI_LIBRARY} ${D3D12_LIBRARY})
+    endif()
+
+elseif(APPLE AND NOT TVOS)
+    # macOS bundle configuration
+    set(MACOS_RESOURCES sys/posix/res/Valkyrie.icns)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${MACOS_RESOURCES})
+        set_source_files_properties(${MACOS_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    endif()
+
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION 1.0.0)
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING 1.0.0)
+    set(MACOSX_BUNDLE_ICON_FILE Valkyrie.icns)
+
+    add_executable(${APP_NAME} MACOSX_BUNDLE ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES} ${MACOS_RESOURCES})
+
+    # Set rpath to look in the app bundle
+    set_target_properties(${APP_NAME} PROPERTIES
+            INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
+            BUILD_WITH_INSTALL_RPATH TRUE
+    )
+
+    # Create Frameworks directory
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks
+            COMMENT "Creating Frameworks directory"
+    )
+
+    # Copy SDL2 framework if it exists
+    if(EXISTS ${SDL2_LIBRARY} AND IS_DIRECTORY ${SDL2_LIBRARY})
+        add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${SDL2_LIBRARY}
+                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework
+                COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework 2>/dev/null || true
+                COMMENT "Copying SDL2 framework"
+        )
+    endif()
+
+    # Copy SDL2_image library
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${SDL2_IMAGE_LIBRARY}
+            $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/
+            COMMENT "Copying SDL2_image library"
+    )
+
+    # Fix permissions and remove quarantine attributes
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/ 2>/dev/null || true
+            COMMAND xattr -cr $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/ 2>/dev/null || true
+            COMMAND xattr -cr $<TARGET_BUNDLE_DIR:${APP_NAME}> 2>/dev/null || true
+            COMMENT "Fixing permissions and removing quarantine"
+    )
+
+    # Sign frameworks and libraries using find command
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND find $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks -name "*.dylib" -exec codesign --force --sign - {} \\$<SEMICOLON> 2>/dev/null || true
+            COMMAND find $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks -name "*.framework" -type d -maxdepth 1 -exec codesign --force --deep --sign - {} \\$<SEMICOLON> 2>/dev/null || true
+            COMMENT "Signing embedded frameworks and libraries"
+    )
+
+    # Finally sign the main app bundle
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND codesign --force --sign - $<TARGET_BUNDLE_DIR:${APP_NAME}> 2>/dev/null || true
+            COMMENT "Signing app bundle"
+    )
+else()
+    # Default executable for Linux, Android, tvOS, etc.
+    add_executable(${APP_NAME} ${VALKYRIE_SOURCES} ${VALKYRIE_INCLUDES})
+endif()
+
+# Link all collected libraries
+target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
+
+# MSVC Studio settings
+if(MSVC)
+    set(CMAKE_SYSTEM_VERSION 10.0.22621.0) # Windows 11 SDK
 endif()

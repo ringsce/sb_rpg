@@ -59,33 +59,3 @@ bool validateClient(const std::string &username, const std::string &password) {
         return false;
     }
 }
-
-int main() {
-    std::string username, password;
-    int choice;
-
-    std::cout << "Welcome to the game!" << std::endl;
-    std::cout << "1. Register\n2. Login\nChoose an option: ";
-    std::cin >> choice;
-    std::cin.ignore(); // Clear newline from input buffer
-
-    std::cout << "Enter username: ";
-    std::getline(std::cin, username);
-    std::cout << "Enter password: ";
-    std::getline(std::cin, password);
-
-    if (choice == 1) {
-        if (registerClient(username, password)) {
-            std::cout << "You can now log in." << std::endl;
-        }
-    } else if (choice == 2) {
-        if (validateClient(username, password)) {
-            std::cout << "Welcome to the game, " << username << "!" << std::endl;
-        }
-    } else {
-        std::cerr << "Invalid option. Please restart the program." << std::endl;
-    }
-
-    return 0;
-}
-

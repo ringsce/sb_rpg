@@ -1,4 +1,4 @@
-#include "AI.h"
+#include "ai.h"
 
 AI::AI(int states, int actions) : states(states), actions(actions) {
     qTable.resize(states, std::vector<double>(actions, 0.0)); // Initialize Q-table

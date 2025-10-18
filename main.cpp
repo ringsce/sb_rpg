@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include "game_utils.h"
+#include "srv/serverRegistration.h"
 
 // Platform-specific includes for cross-platform support
 #if defined(__ANDROID__)

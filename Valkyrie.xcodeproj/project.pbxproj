@@ -1,0 +1,525 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07416EF283A07E9B3B22BB75 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 110041F4487BD7C4F306FD6F /* main.cpp */; };
+		1E94D0F9BDBCADCA00D69911 /* Valkyrie.icns in Resources */ = {isa = PBXBuildFile; fileRef = E3D04B0809B6510A17D6A3DF /* Valkyrie.icns */; };
+		20CAAFEA694214BA917D3AFB /* commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9014AD37047C10D47C426A7D /* commands.cpp */; };
+		3923BEE6AFF8FBB3B02F10B4 /* serverRegistration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F3CC81EDC8F6FE351FD1FC /* serverRegistration.cpp */; };
+		4502F323C63453BB3E747C7A /* game_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F958B6D4AC529E4651A539D6 /* game_utils.cpp */; };
+		4E9708008C70E7088B17C384 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 173A4539EF714C3D3DFB810A /* Cocoa.framework */; };
+		76FF04D56539E226857562AF /* credits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16F61AB755C9680C6C576F63 /* credits.cpp */; };
+		7F618F70C840BB57AEAAF1C7 /* gamepad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5AC043AA46B74D5892AC2634 /* gamepad.cpp */; };
+		8643D0B7F146E09F347D333E /* ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01F3D10A47CC279464363D70 /* ai.cpp */; };
+		CA8F47F13613F3C50170849A /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01E618F77488C3B21CD328D4 /* camera.cpp */; };
+		D80199FFEF63AD3BE33DF777 /* api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF5474AB607E99B85400B6FD /* api.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4ACC6C3D270A55B14A6B04EE /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		01E618F77488C3B21CD328D4 /* camera.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = src/camera.cpp; sourceTree = "<group>"; };
+		01F3D10A47CC279464363D70 /* ai.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = ai.cpp; path = src/ai.cpp; sourceTree = "<group>"; };
+		09A9C2EE428E7B68EE38C02B /* gamepad.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = gamepad.h; path = src/gamepad.h; sourceTree = "<group>"; };
+		110041F4487BD7C4F306FD6F /* main.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		16F61AB755C9680C6C576F63 /* credits.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = credits.cpp; path = src/credits.cpp; sourceTree = "<group>"; };
+		173A4539EF714C3D3DFB810A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		19F3CC81EDC8F6FE351FD1FC /* serverRegistration.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = serverRegistration.cpp; path = srv/serverRegistration.cpp; sourceTree = "<group>"; };
+		2289C5DADAA9E5A28220D163 /* commands.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = commands.h; path = src/commands.h; sourceTree = "<group>"; };
+		5AC043AA46B74D5892AC2634 /* gamepad.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = gamepad.cpp; path = src/gamepad.cpp; sourceTree = "<group>"; };
+		5B458A373EEABBDDEAFF777A /* ai.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ai.h; path = src/ai.h; sourceTree = "<group>"; };
+		8295B38E8480EC81C0C5C16D /* Valkyrie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Valkyrie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9014AD37047C10D47C426A7D /* commands.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = commands.cpp; path = src/commands.cpp; sourceTree = "<group>"; };
+		B02E5F8A360B8FF46D831F2D /* api.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = api.h; path = src/api.h; sourceTree = "<group>"; };
+		B77E19DA4BAE6401554607F8 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0BCB4D8DA097CB090CB0917 /* game_utils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = game_utils.h; sourceTree = "<group>"; };
+		E3D04B0809B6510A17D6A3DF /* Valkyrie.icns */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.icns; name = Valkyrie.icns; path = sys/posix/res/Valkyrie.icns; sourceTree = "<group>"; };
+		F958B6D4AC529E4651A539D6 /* game_utils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = game_utils.cpp; sourceTree = "<group>"; };
+		FF5474AB607E99B85400B6FD /* api.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = api.cpp; path = src/api.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C90D65E1FA6D4EB33B1E3247 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E9708008C70E7088B17C384 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		238379109D8492D0A3EF20BB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8295B38E8480EC81C0C5C16D /* Valkyrie.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		284BBB40964E1704FFA2F624 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3EA72826B9233A457DE96BDA /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3EA72826B9233A457DE96BDA /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				173A4539EF714C3D3DFB810A /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		AABF17DEF037561A1B026C91 /* srv */ = {
+			isa = PBXGroup;
+			children = (
+				19F3CC81EDC8F6FE351FD1FC /* serverRegistration.cpp */,
+			);
+			name = srv;
+			sourceTree = "<group>";
+		};
+		B787BAC2DE2EEB15D9ED3B60 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				01F3D10A47CC279464363D70 /* ai.cpp */,
+				FF5474AB607E99B85400B6FD /* api.cpp */,
+				01E618F77488C3B21CD328D4 /* camera.cpp */,
+				9014AD37047C10D47C426A7D /* commands.cpp */,
+				16F61AB755C9680C6C576F63 /* credits.cpp */,
+				5AC043AA46B74D5892AC2634 /* gamepad.cpp */,
+				5B458A373EEABBDDEAFF777A /* ai.h */,
+				B02E5F8A360B8FF46D831F2D /* api.h */,
+				2289C5DADAA9E5A28220D163 /* commands.h */,
+				09A9C2EE428E7B68EE38C02B /* gamepad.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		CEC026CB4BE0F51AB79BED61 = {
+			isa = PBXGroup;
+			children = (
+				238379109D8492D0A3EF20BB /* Products */,
+				284BBB40964E1704FFA2F624 /* Frameworks */,
+				FDD2B5FE4C379D5512C2D4CC /* Sources */,
+				EE2E24B83CFB97E745E85464 /* Resources */,
+				B77E19DA4BAE6401554607F8 /* Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		EE2E24B83CFB97E745E85464 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E3D04B0809B6510A17D6A3DF /* Valkyrie.icns */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		FDD2B5FE4C379D5512C2D4CC /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B787BAC2DE2EEB15D9ED3B60 /* src */,
+				AABF17DEF037561A1B026C91 /* srv */,
+				F958B6D4AC529E4651A539D6 /* game_utils.cpp */,
+				110041F4487BD7C4F306FD6F /* main.cpp */,
+				C0BCB4D8DA097CB090CB0917 /* game_utils.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4B700949CF140E40E20EFCC5 /* Valkyrie */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D53871F6872A37256C951A4E /* Build configuration list for PBXNativeTarget "Valkyrie" */;
+			buildPhases = (
+				028D22416187DCCFB47D6361 /* Sources */,
+				C90D65E1FA6D4EB33B1E3247 /* Frameworks */,
+				172AA519E6FBF5A9F772E252 /* Resources */,
+				4ACC6C3D270A55B14A6B04EE /* Embed Frameworks */,
+				9DA86B1500CD6360A562F7DD /* Sign Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Valkyrie;
+			productName = Valkyrie;
+			productReference = 8295B38E8480EC81C0C5C16D /* Valkyrie.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F696D635DCD8A89341AB9230 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					4B700949CF140E40E20EFCC5 = {
+						DevelopmentTeam = XJX8PUCD89;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AAEDFB2377641CE960668825 /* Build configuration list for PBXProject "Valkyrie" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CEC026CB4BE0F51AB79BED61;
+			productRefGroup = 238379109D8492D0A3EF20BB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B700949CF140E40E20EFCC5 /* Valkyrie */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		172AA519E6FBF5A9F772E252 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E94D0F9BDBCADCA00D69911 /* Valkyrie.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9DA86B1500CD6360A562F7DD /* Sign Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sign Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Remove quarantine attributes\nxattr -cr \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/\" 2>/dev/null || true\n\n# Sign each framework/dylib\nfor file in \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks\"/*.{dylib,framework}; do\n    if [ -e \"$file\" ]; then\n        codesign --force --sign - \"$file\" 2>/dev/null || true\n    fi\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		028D22416187DCCFB47D6361 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4502F323C63453BB3E747C7A /* game_utils.cpp in Sources */,
+				8643D0B7F146E09F347D333E /* ai.cpp in Sources */,
+				D80199FFEF63AD3BE33DF777 /* api.cpp in Sources */,
+				CA8F47F13613F3C50170849A /* camera.cpp in Sources */,
+				20CAAFEA694214BA917D3AFB /* commands.cpp in Sources */,
+				76FF04D56539E226857562AF /* credits.cpp in Sources */,
+				7F618F70C840BB57AEAAF1C7 /* gamepad.cpp in Sources */,
+				07416EF283A07E9B3B22BB75 /* main.cpp in Sources */,
+				3923BEE6AFF8FBB3B02F10B4 /* serverRegistration.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2514154BA28C5DB7738C57E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		36215CB6C088AFE52AC94AB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XJX8PUCD89;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+					/Library/Frameworks,
+				);
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"USE_MOLTENVK=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/include,
+					/opt/homebrew/include/SDL2,
+					/opt/homebrew/include/SDL3,
+					/usr/local/include,
+					/usr/local/include/MoltenVK,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					Foundation,
+					"-framework",
+					QuartzCore,
+					"-lSDL2",
+					"-lSDL2_image",
+					"-lcurl",
+					"/usr/local/lib/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.valkyrie.game;
+				PRODUCT_NAME = Valkyrie;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		374ABC5392A953CB004D526A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XJX8PUCD89;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+					/Library/Frameworks,
+				);
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"USE_MOLTENVK=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/include,
+					/opt/homebrew/include/SDL2,
+					/opt/homebrew/include/SDL3,
+					/usr/local/include,
+					/usr/local/include/MoltenVK,
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(LOCAL_APPS_DIR)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/lib,
+					/usr/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					Foundation,
+					"-framework",
+					QuartzCore,
+					"-lSDL2",
+					"-lSDL2_image",
+					"-lcurl",
+					"/usr/local/lib/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.valkyrie.game;
+				PRODUCT_NAME = Valkyrie;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		F5D50DFA2B6D3324BC4E922E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AAEDFB2377641CE960668825 /* Build configuration list for PBXProject "Valkyrie" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5D50DFA2B6D3324BC4E922E /* Debug */,
+				2514154BA28C5DB7738C57E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D53871F6872A37256C951A4E /* Build configuration list for PBXNativeTarget "Valkyrie" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				374ABC5392A953CB004D526A /* Release */,
+				36215CB6C088AFE52AC94AB4 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F696D635DCD8A89341AB9230 /* Project object */;
+}
