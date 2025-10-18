@@ -5,6 +5,7 @@ if(NOT DEFINED APP_NAME)
     set(APP_NAME Valkyrie)
 endif()
 project(${APP_NAME})
+include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -48,7 +49,7 @@ option(WINDOWS10                 "Build for Windows 10+" ON)
 option(USE_SYSTEM_ZLIB           "Use the system zlib instead of the bundled one" OFF)
 option(USE_SYSTEM_RAPIDJSON      "Use the system rapidjson instead of the bundled one" OFF)
 option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" ON)
-option(USE_KCC                   "Use Kayte C Compiler for game scripts" OFF)
+option(USE_KCC                   "Use Kayte C Compiler for game scripts" ON)
 
 if(USE_MoltenVK)
     add_definitions(-DUSE_MOLTENVK)
@@ -56,12 +57,33 @@ endif()
 
 # Find KCC (Kayte C Compiler) for game scripts
 if(USE_KCC)
-    find_package(KCC)
+    find_package(KCC QUIET) # Try to find system-installed KCC first
+
+    if(NOT KCC_FOUND)
+        message(STATUS "KCC not found locally. Fetching from GitHub...")
+        FetchContent_Declare(
+                KCC
+                GIT_REPOSITORY https://www.github.com/ringsce/kcc.git
+                GIT_TAG main # WARNING: Recommend pinning to a specific commit/tag for reproducible builds
+        )
+
+        # This will download, configure, and build KCC as a sub-project.
+        # Its targets (like KCC::Runtime) and functions (like kcc_compile_files)
+        # will become available in this scope.
+        FetchContent_MakeAvailable(KCC)
+
+        # After fetching, check if the required components are now available
+        if(COMMAND kcc_compile_files AND TARGET KCC::Runtime)
+            set(KCC_FOUND TRUE) # Manually set KCC_FOUND for later logic in this script
+        endif()
+    endif()
+
+    # This block will now run if KCC was found on the system OR if FetchContent succeeded
     if(KCC_FOUND)
         message(STATUS "Kayte C Compiler (KCC) enabled for Samurai Babel RPG scripts")
         add_definitions(-DUSE_KCC_SCRIPTS)
 
-        # KCC script sources for game logic
+        # KCC script sources for game logic [cite: 6]
         set(KCC_SCRIPT_SOURCES
                 # Add your .kcc script files here
                 # scripts/game_logic.kcc
@@ -69,17 +91,18 @@ if(USE_KCC)
                 # scripts/combat_rules.kcc
         )
 
-        # Compile KCC scripts if any exist
+        # Compile KCC scripts if any exist [cite: 7]
         if(KCC_SCRIPT_SOURCES)
             kcc_compile_files(KCC_COMPILED_OBJECTS ${KCC_SCRIPT_SOURCES})
             message(STATUS "Compiling ${CMAKE_CURRENT_LIST_LENGTH} KCC script files")
         endif()
     else()
-        message(STATUS "KCC not found. Building without KCC script support.")
-        message(STATUS "To enable KCC: Set KCC_ROOT environment variable or install KCC")
+        # This 'else' block is entered if system KCC failed AND FetchContent also failed
+        message(WARNING "KCC not found and failed to fetch/configure from GitHub.")
+        message(WARNING "Building without KCC script support.")
+        message(STATUS "To enable KCC: Set KCC_ROOT environment variable or install KCC.")
     endif()
 endif()
-
 
 # Source files
 set(VALKYRIE_SOURCES
