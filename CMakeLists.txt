@@ -48,9 +48,36 @@ option(WINDOWS10                 "Build for Windows 10+" ON)
 option(USE_SYSTEM_ZLIB           "Use the system zlib instead of the bundled one" OFF)
 option(USE_SYSTEM_RAPIDJSON      "Use the system rapidjson instead of the bundled one" OFF)
 option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" ON)
+option(USE_KCC                   "Use Kayte C Compiler for game scripts" OFF)
 
 if(USE_MoltenVK)
     add_definitions(-DUSE_MOLTENVK)
+endif()
+
+# Find KCC (Kayte C Compiler) for game scripts
+if(USE_KCC)
+    find_package(KCC)
+    if(KCC_FOUND)
+        message(STATUS "Kayte C Compiler (KCC) enabled for Samurai Babel RPG scripts")
+        add_definitions(-DUSE_KCC_SCRIPTS)
+
+        # KCC script sources for game logic
+        set(KCC_SCRIPT_SOURCES
+                # Add your .kcc script files here
+                # scripts/game_logic.kcc
+                # scripts/quest_system.kcc
+                # scripts/combat_rules.kcc
+        )
+
+        # Compile KCC scripts if any exist
+        if(KCC_SCRIPT_SOURCES)
+            kcc_compile_files(KCC_COMPILED_OBJECTS ${KCC_SCRIPT_SOURCES})
+            message(STATUS "Compiling ${CMAKE_CURRENT_LIST_LENGTH} KCC script files")
+        endif()
+    else()
+        message(STATUS "KCC not found. Building without KCC script support.")
+        message(STATUS "To enable KCC: Set KCC_ROOT environment variable or install KCC")
+    endif()
 endif()
 
 
@@ -66,6 +93,12 @@ set(VALKYRIE_SOURCES
         main.cpp
         srv/serverRegistration.cpp
 )
+
+# Add KCC compiled objects if available
+if(KCC_FOUND AND KCC_COMPILED_OBJECTS)
+    list(APPEND VALKYRIE_SOURCES ${KCC_COMPILED_OBJECTS})
+    message(STATUS "Added ${CMAKE_CURRENT_LIST_LENGTH} KCC compiled objects to build")
+endif()
 
 set(VALKYRIE_INCLUDES
         game_utils.h
@@ -301,6 +334,17 @@ endif()
 
 # Link all collected libraries
 target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
+
+# Link KCC runtime if available
+if(KCC_FOUND AND TARGET KCC::Runtime)
+    target_link_libraries(${APP_NAME} PRIVATE KCC::Runtime)
+    message(STATUS "Linked KCC runtime library to ${APP_NAME}")
+endif()
+
+# Add KCC include directory if available
+if(KCC_FOUND AND KCC_INCLUDE_DIR)
+    target_include_directories(${APP_NAME} PRIVATE ${KCC_INCLUDE_DIR})
+endif()
 
 # MSVC Studio settings
 if(MSVC)
