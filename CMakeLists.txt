@@ -79,7 +79,6 @@ endif()
 
 # Source files
 set(VALKYRIE_SOURCES
-        game_utils.cpp
         src/ai.cpp
         src/api.cpp
         src/camera.cpp
@@ -88,6 +87,7 @@ set(VALKYRIE_SOURCES
         src/gamepad.cpp
         main.cpp
         srv/serverRegistration.cpp
+        src/game_utils.cpp
 )
 
 # Add KCC compiled objects if available
@@ -103,6 +103,7 @@ set(VALKYRIE_INCLUDES
         src/commands.h
         src/gamepad.h
         srv/serverRegistration.h
+        src/resource_utils.h
 )
 
 # SDL2/SDL3 Configuration
@@ -322,6 +323,48 @@ elseif(APPLE AND NOT TVOS)
             COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks
             COMMENT "Creating Frameworks directory"
     )
+
+    # Copy Resources (images, assets, etc.) into the bundle
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Resources
+            COMMENT "Creating Resources directory"
+    )
+
+    # Copy PNG files from project root and common asset directories
+    if(EXISTS ${CMAKE_SOURCE_DIR}/SamuraiBabel.png)
+        add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${CMAKE_SOURCE_DIR}/SamuraiBabel.png
+                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Resources/
+                COMMENT "Copying SamuraiBabel.png to Resources"
+        )
+    endif()
+
+    # Copy all PNG files from assets directory if it exists
+    if(EXISTS ${CMAKE_SOURCE_DIR}/assets)
+        file(GLOB ASSET_IMAGES "${CMAKE_SOURCE_DIR}/assets/*.png" "${CMAKE_SOURCE_DIR}/assets/*.jpg")
+        foreach(ASSET_FILE ${ASSET_IMAGES})
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${ASSET_FILE}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Resources/
+                    COMMENT "Copying asset: ${ASSET_FILE}"
+            )
+        endforeach()
+    endif()
+
+    # Copy all PNG files from res directory if it exists
+    if(EXISTS ${CMAKE_SOURCE_DIR}/res)
+        file(GLOB RES_IMAGES "${CMAKE_SOURCE_DIR}/res/*.png" "${CMAKE_SOURCE_DIR}/res/*.jpg")
+        foreach(RES_FILE ${RES_IMAGES})
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${RES_FILE}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Resources/
+                    COMMENT "Copying resource: ${RES_FILE}"
+            )
+        endforeach()
+    endif()
 
     # Check for SDL2 as framework or dylib
     if(SDL2_LIBRARY)
