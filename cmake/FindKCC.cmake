@@ -126,17 +126,12 @@ if(NOT KCC_FOUND_LOCALLY)
             GIT_TAG main # WARNING: Recommend pinning to a specific commit/tag
     )
 
-    # This downloads, configures, and builds KCC as a sub-project.
-    # We assume this sub-project defines:
-    # 1. Target KCC::Runtime
-    # 2. Function kcc_compile_files()
     FetchContent_MakeAvailable(KCC)
 
     # After fetching, check if the required components are now available
-    if(COMMAND kcc_compile_files AND TARGET KCC::Runtime)
+    if(TARGET KCC::Runtime)
         set(KCC_FOUND TRUE) # Manually set KCC_FOUND
 
-        # Manually populate the variables this module is expected to set
         if(TARGET KCC::KCC)
             set(KCC_EXECUTABLE $<TARGET_FILE:KCC::KCC>)
         endif()
@@ -145,7 +140,6 @@ if(NOT KCC_FOUND_LOCALLY)
         set(KCC_LIBRARIES KCC::Runtime)
         get_target_property(KCC_INCLUDE_DIR KCC::Runtime INTERFACE_INCLUDE_DIRECTORIES)
 
-        # Try to get version from subproject
         if(NOT KCC_VERSION AND DEFINED KCC_VERSION)
             # KCC_VERSION might have been set by the subproject
         else()
@@ -164,7 +158,10 @@ if(NOT KCC_FOUND_LOCALLY)
     endif()
 endif() # End of fetch block
 
-# --- 3. Define local targets/functions (ONLY if found locally) ---
+# --- 3. Define local targets (ONLY if found locally) ---
+
+# If KCC was found locally, we must manually create the imported targets
+# as they were not created by FetchContent.
 
 if(KCC_FOUND_LOCALLY)
 
@@ -194,10 +191,32 @@ if(KCC_FOUND_LOCALLY)
         endif()
     endif()
 
+    if(KCC_FOUND AND NOT _KCC_FIND_QUIETLY)
+        message(STATUS "Found KCC: ${KCC_EXECUTABLE} (version ${KCC_VERSION})")
+        if(KCC_INCLUDE_DIR)
+            message(STATUS "  KCC include dir: ${KCC_INCLUDE_DIR}")
+        endif()
+        if(KCC_LIBRARY_DIR)
+            message(STATUS "  KCC library dir: ${KCC_LIBRARY_DIR}")
+        endif()
+        if(KCC_RUNTIME_LIBRARY)
+            message(STATUS "  KCC runtime: ${KCC_RUNTIME_LIBRARY}")
+        endif()
+    endif()
+endif() # End of KCC_FOUND_LOCALLY block
+
+
+# --- 4. Define helper functions (if KCC was found) ---
+
+# These functions are now defined if KCC was found either
+# locally OR via fetch.
+
+if(KCC_FOUND)
+    # Function to compile KCC source files
     if(NOT COMMAND kcc_compile)
         function(kcc_compile OUTPUT_VAR INPUT_FILE)
-            if(NOT KCC_FOUND)
-                message(FATAL_ERROR "KCC not found. Cannot compile ${INPUT_FILE}")
+            if(NOT KCC_EXECUTABLE)
+                message(FATAL_ERROR "KCC_EXECUTABLE not set. Cannot compile ${INPUT_FILE}")
             endif()
 
             set(options VERBOSE)
@@ -217,7 +236,7 @@ if(KCC_FOUND_LOCALLY)
             set(COMPILE_FLAGS "")
 
             foreach(inc ${KCC_COMPILE_INCLUDES})
-                list(APPEND COMPLATE_FLAGS "-I${inc}")
+                list(APPEND COMPILE_FLAGS "-I${inc}")
             endforeach()
 
             foreach(def ${KCC_COMPILE_DEFINES})
@@ -239,6 +258,7 @@ if(KCC_FOUND_LOCALLY)
         endfunction()
     endif()
 
+    # Function to compile multiple KCC files
     if(NOT COMMAND kcc_compile_files)
         function(kcc_compile_files OUTPUT_VAR)
             set(OUTPUT_FILES "")
@@ -251,22 +271,10 @@ if(KCC_FOUND_LOCALLY)
             set(${OUTPUT_VAR} ${OUTPUT_FILES} PARENT_SCOPE)
         endfunction()
     endif()
+endif() # End of if(KCC_FOUND)
 
-    if(KCC_FOUND AND NOT _KCC_FIND_QUIETLY)
-        message(STATUS "Found KCC: ${KCC_EXECUTABLE} (version ${KCC_VERSION})")
-        if(KCC_INCLUDE_DIR)
-            message(STATUS "  KCC include dir: ${KCC_INCLUDE_DIR}")
-        endif()
-        if(KCC_LIBRARY_DIR)
-            message(STATUS "  KCC library dir: ${KCC_LIBRARY_DIR}")
-        endif()
-        if(KCC_RUNTIME_LIBRARY)
-            message(STATUS "  KCC runtime: ${KCC_RUNTIME_LIBRARY}")
-        endif()
-    endif()
-endif() # End of KCC_FOUND_LOCALLY block
 
-# --- 4. Final failure check ---
+# --- 5. Final failure check ---
 
 if(NOT KCC_FOUND AND _KCC_FIND_REQUIRED)
     message(FATAL_ERROR "Could not find or fetch KCC. Set KCC_ROOT, install KCC, or check network access.")

@@ -47,8 +47,8 @@ option(ONATIVE                   "Optimize for the host CPU" OFF)
 option(WINDOWS10                 "Build for Windows 10+" ON)
 option(USE_SYSTEM_ZLIB           "Use the system zlib instead of the bundled one" OFF)
 option(USE_SYSTEM_RAPIDJSON      "Use the system rapidjson instead of the bundled one" OFF)
-option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" ON)
-option(USE_KCC                   "Use Kayte C Compiler for game scripts" ON) # <-- SET TO ON
+option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" OFF)
+option(USE_KCC                   "Use Kayte C Compiler for game scripts" OFF)
 
 if(USE_MoltenVK)
     add_definitions(-DUSE_MOLTENVK)
@@ -105,23 +105,114 @@ set(VALKYRIE_INCLUDES
         srv/serverRegistration.h
 )
 
-# SDL2/SDL3
+# SDL2/SDL3 Configuration
 if(USE_SDL3)
-    find_package(SDL3 REQUIRED)
-    include_directories(${SDL3_INCLUDE_DIRS})
-    list(APPEND EXTRA_LIBS ${SDL3_LIBRARIES})
-    # Note: SDL3_image is not standard yet, assuming SDL2_image for now
-    find_package(SDL2_image REQUIRED)
-    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-    list(APPEND EXTRA_LIBS ${SDL2_IMAGE_LIBRARIES})
-else()
-    find_package(SDL2 REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIRS})
-    list(APPEND EXTRA_LIBS ${SDL2_LIBRARIES})
+    message(STATUS "Looking for SDL3...")
+    find_package(SDL3 QUIET)
 
-    find_package(SDL2_image REQUIRED)
-    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-    list(APPEND EXTRA_LIBS ${SDL2_IMAGE_LIBRARIES})
+    if(SDL3_FOUND)
+        message(STATUS "SDL3 found and enabled")
+        include_directories(${SDL3_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${SDL3_LIBRARIES})
+        add_definitions(-DUSE_SDL3)
+
+        # Try to find SDL3_image (may not be available yet)
+        find_package(SDL3_image QUIET)
+        if(SDL3_image_FOUND)
+            include_directories(${SDL3_IMAGE_INCLUDE_DIRS})
+            list(APPEND EXTRA_LIBS ${SDL3_IMAGE_LIBRARIES})
+        else()
+            message(WARNING "SDL3_image not found, falling back to SDL2_image")
+            find_package(SDL2_image REQUIRED)
+            include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+            list(APPEND EXTRA_LIBS ${SDL2_IMAGE_LIBRARIES})
+        endif()
+    else()
+        message(WARNING "SDL3 not found, falling back to SDL2")
+        set(USE_SDL3 OFF)
+    endif()
+endif()
+
+# Use SDL2 if SDL3 is not enabled or not found
+if(NOT USE_SDL3)
+    message(STATUS "Using SDL2")
+
+    # Explicitly set SDL2 paths to avoid SDL3
+    set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/sdl2;/opt/homebrew/opt/sdl2_image;${CMAKE_PREFIX_PATH}")
+    set(SDL2_DIR "/opt/homebrew/opt/sdl2/lib/cmake/SDL2")
+
+    find_package(SDL2 REQUIRED CONFIG)
+
+    if(NOT SDL2_FOUND)
+        message(FATAL_ERROR "SDL2 not found! Install with: brew install sdl2 sdl2_image")
+    endif()
+
+    message(STATUS "SDL2 found at: ${SDL2_DIR}")
+    message(STATUS "SDL2 libraries: ${SDL2_LIBRARIES}")
+
+    # Find SDL2_image - try multiple approaches
+    set(SDL2_IMAGE_DIR "/opt/homebrew/opt/sdl2_image/lib/cmake/SDL2_image")
+
+    # First try CONFIG mode
+    find_package(SDL2_image QUIET CONFIG PATHS /opt/homebrew/opt/sdl2_image/lib/cmake/SDL2_image)
+
+    # If not found, try MODULE mode with pkg-config
+    if(NOT SDL2_image_FOUND)
+        find_package(PkgConfig QUIET)
+        if(PKG_CONFIG_FOUND)
+            pkg_check_modules(SDL2_IMAGE QUIET SDL2_image)
+        endif()
+    endif()
+
+    # If still not found, manually find the library
+    if(NOT SDL2_image_FOUND AND NOT SDL2_IMAGE_FOUND)
+        find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
+                PATHS /opt/homebrew/opt/sdl2_image/include/SDL2
+                /opt/homebrew/include/SDL2
+                /usr/local/include/SDL2
+        )
+        find_library(SDL2_IMAGE_LIBRARY
+                NAMES SDL2_image libSDL2_image
+                PATHS /opt/homebrew/opt/sdl2_image/lib
+                /opt/homebrew/lib
+                /usr/local/lib
+        )
+
+        if(SDL2_IMAGE_INCLUDE_DIR AND SDL2_IMAGE_LIBRARY)
+            set(SDL2_IMAGE_FOUND TRUE)
+            set(SDL2_IMAGE_LIBRARIES ${SDL2_IMAGE_LIBRARY})
+            set(SDL2_IMAGE_INCLUDE_DIRS ${SDL2_IMAGE_INCLUDE_DIR})
+            message(STATUS "SDL2_image found manually at: ${SDL2_IMAGE_LIBRARY}")
+        else()
+            message(FATAL_ERROR "SDL2_image not found! Install with: brew install sdl2_image")
+        endif()
+    else()
+        message(STATUS "SDL2_image found at: ${SDL2_IMAGE_DIR}")
+        message(STATUS "SDL2_image libraries: ${SDL2_IMAGE_LIBRARIES}")
+    endif()
+
+    # Add SDL2 libraries - use target-based linking for modern CMake
+    if(TARGET SDL2::SDL2)
+        list(APPEND EXTRA_LIBS SDL2::SDL2)
+        message(STATUS "Linking SDL2::SDL2 target")
+    else()
+        include_directories(${SDL2_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${SDL2_LIBRARIES})
+        message(STATUS "Linking SDL2 libraries: ${SDL2_LIBRARIES}")
+    endif()
+
+    # Add SDL2_image libraries - handle both target and library variable cases
+    if(TARGET SDL2_image::SDL2_image)
+        list(APPEND EXTRA_LIBS SDL2_image::SDL2_image)
+        message(STATUS "Linking SDL2_image::SDL2_image target")
+    elseif(TARGET SDL2_image::SDL2_image-static)
+        list(APPEND EXTRA_LIBS SDL2_image::SDL2_image-static)
+        message(STATUS "Linking SDL2_image::SDL2_image-static target")
+    else()
+        include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${SDL2_IMAGE_LIBRARIES})
+        message(STATUS "Linking SDL2_image libraries: ${SDL2_IMAGE_LIBRARIES}")
+    endif()
 endif()
 
 
@@ -232,40 +323,44 @@ elseif(APPLE AND NOT TVOS)
             COMMENT "Creating Frameworks directory"
     )
 
-    # --- IMPROVED: Check for SDL2 as framework ---
-    if(EXISTS ${SDL2_LIBRARY} AND IS_DIRECTORY ${SDL2_LIBRARY})
-        add_custom_command(TARGET ${APP_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${SDL2_LIBRARY}
-                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework
-                COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework 2>/dev/null || true
-                COMMENT "Copying SDL2 framework"
-        )
-    elseif(EXISTS ${SDL2_LIBRARY}) # Copy as a .dylib
-        add_custom_command(TARGET ${APP_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${SDL2_LIBRARY}
-                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/
-                COMMENT "Copying SDL2 library"
-        )
+    # Check for SDL2 as framework or dylib
+    if(SDL2_LIBRARY)
+        if(IS_DIRECTORY "${SDL2_LIBRARY}")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${SDL2_LIBRARY}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework
+                    COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2.framework 2>/dev/null || true
+                    COMMENT "Copying SDL2 framework"
+            )
+        elseif(EXISTS "${SDL2_LIBRARY}")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${SDL2_LIBRARY}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/
+                    COMMENT "Copying SDL2 library"
+            )
+        endif()
     endif()
 
-    # --- IMPROVED: Check for SDL2_image as framework ---
-    if(EXISTS ${SDL2_IMAGE_LIBRARY} AND IS_DIRECTORY ${SDL2_IMAGE_LIBRARY})
-        add_custom_command(TARGET ${APP_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${SDL2_IMAGE_LIBRARY}
-                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2_image.framework
-                COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2_image.framework 2>/dev/null || true
-                COMMENT "Copying SDL2_image framework"
-        )
-    elseif(EXISTS ${SDL2_IMAGE_LIBRARY}) # Copy as a .dylib
-        add_custom_command(TARGET ${APP_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${SDL2_IMAGE_LIBRARY}
-                $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/
-                COMMENT "Copying SDL2_image library"
-        )
+    # Check for SDL2_image as framework or dylib
+    if(SDL2_IMAGE_LIBRARY)
+        if(IS_DIRECTORY "${SDL2_IMAGE_LIBRARY}")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${SDL2_IMAGE_LIBRARY}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2_image.framework
+                    COMMAND chmod -R u+w $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/SDL2_image.framework 2>/dev/null || true
+                    COMMENT "Copying SDL2_image framework"
+            )
+        elseif(EXISTS "${SDL2_IMAGE_LIBRARY}")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${SDL2_IMAGE_LIBRARY}
+                    $<TARGET_BUNDLE_CONTENT_DIR:${APP_NAME}>/Frameworks/
+                    COMMENT "Copying SDL2_image library"
+            )
+        endif()
     endif()
 
     # Fix permissions and remove quarantine attributes
@@ -294,7 +389,18 @@ else()
 endif()
 
 # Link all collected libraries
+message(STATUS "Linking ${APP_NAME} with libraries: ${EXTRA_LIBS}")
 target_link_libraries(${APP_NAME} PRIVATE ${EXTRA_LIBS})
+
+# Ensure SDL2 is properly linked on macOS
+if(APPLE AND NOT USE_SDL3)
+    if(TARGET SDL2::SDL2)
+        target_link_libraries(${APP_NAME} PRIVATE SDL2::SDL2)
+    endif()
+    if(TARGET SDL2_image::SDL2_image)
+        target_link_libraries(${APP_NAME} PRIVATE SDL2_image::SDL2_image)
+    endif()
+endif()
 
 # Link KCC runtime if available
 if(KCC_FOUND AND TARGET KCC::Runtime)
