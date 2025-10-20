@@ -89,6 +89,8 @@ set(VALKYRIE_SOURCES
         src/gamepad.cpp
         main.cpp
         srv/serverRegistration.cpp
+        src/MainWindow.h
+        src/MainWindow.cpp
 )
 
 # Add KCC compiled objects if available
