@@ -49,6 +49,7 @@ option(USE_SYSTEM_ZLIB           "Use the system zlib instead of the bundled one
 option(USE_SYSTEM_RAPIDJSON      "Use the system rapidjson instead of the bundled one" OFF)
 option(USE_SDL3                  "Use SDL3 instead of SDL2 if available" OFF)
 option(USE_KCC                   "Use Kayte C Compiler for game scripts" OFF)
+option(USE_QT6                   "Use Qt6 GUI framework" ON)
 
 if(USE_MoltenVK)
     add_definitions(-DUSE_MOLTENVK)
@@ -79,6 +80,7 @@ endif()
 
 # Source files
 set(VALKYRIE_SOURCES
+        game_utils.cpp
         src/ai.cpp
         src/api.cpp
         src/camera.cpp
@@ -87,7 +89,6 @@ set(VALKYRIE_SOURCES
         src/gamepad.cpp
         main.cpp
         srv/serverRegistration.cpp
-        src/game_utils.cpp
 )
 
 # Add KCC compiled objects if available
@@ -103,7 +104,6 @@ set(VALKYRIE_INCLUDES
         src/commands.h
         src/gamepad.h
         srv/serverRegistration.h
-        src/resource_utils.h
 )
 
 # SDL2/SDL3 Configuration
