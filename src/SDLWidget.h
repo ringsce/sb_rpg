@@ -12,7 +12,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <SDL.h>
-#include "AnbernicConfig.h"
+#include "ANBERNIC_CONFIG.h"
 
 class SDLWidget : public QWidget {
     Q_OBJECT

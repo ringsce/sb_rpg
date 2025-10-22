@@ -1,7 +1,3 @@
-//
-// Created by Pedro Dias Vicente on 20/10/2025.
-//
-
 // src/MainWindow.h - Qt6 Main Window with SDL Widget
 
 #ifndef MAINWINDOW_H
@@ -43,4 +39,3 @@ private:
 };
 
 #endif // MAINWINDOW_H
-

@@ -1,13 +1,17 @@
-// ============================================================================
-// AnbernicConfig.cpp
-// ============================================================================
+// src/AnbernicConfig.cpp - Anbernic device detection implementation
 
 #include "ANBERNIC_CONFIG.h"
 #include <fstream>
 #include <algorithm>
+#include <cstring>
+
+#ifdef __linux__
 #include <sys/utsname.h>
+#include <unistd.h>
+#endif
 
 AnbernicDevice AnbernicDetector::detectDevice() {
+#ifdef __linux__
     // Try multiple detection methods
     AnbernicDevice device = detectFromModel();
     if (device != AnbernicDevice::Unknown) return device;
@@ -17,9 +21,14 @@ AnbernicDevice AnbernicDetector::detectDevice() {
 
     device = detectFromCpuInfo();
     return device;
+#else
+    // Not on Linux, can't be an Anbernic device
+    return AnbernicDevice::Unknown;
+#endif
 }
 
 AnbernicDevice AnbernicDetector::detectFromModel() {
+#ifdef __linux__
     std::ifstream modelFile("/sys/firmware/devicetree/base/model");
     if (!modelFile.is_open()) return AnbernicDevice::Unknown;
 
@@ -44,11 +53,13 @@ AnbernicDevice AnbernicDetector::detectFromModel() {
     if (model.find("rg28xx") != std::string::npos) return AnbernicDevice::RG28XX;
     if (model.find("rg-arc-d") != std::string::npos) return AnbernicDevice::RG_ARC_D;
     if (model.find("rg-arc-s") != std::string::npos) return AnbernicDevice::RG_ARC_S;
+#endif
 
     return AnbernicDevice::Unknown;
 }
 
 AnbernicDevice AnbernicDetector::detectFromDeviceTree() {
+#ifdef __linux__
     std::ifstream compatFile("/sys/firmware/devicetree/base/compatible");
     if (!compatFile.is_open()) return AnbernicDevice::Unknown;
 
@@ -64,11 +75,13 @@ AnbernicDevice AnbernicDetector::detectFromDeviceTree() {
         if (compat.find("rg503") != std::string::npos) return AnbernicDevice::RG503;
         if (compat.find("rg552") != std::string::npos) return AnbernicDevice::RG552;
     }
+#endif
 
     return AnbernicDevice::Unknown;
 }
 
 AnbernicDevice AnbernicDetector::detectFromCpuInfo() {
+#ifdef __linux__
     std::ifstream cpuFile("/proc/cpuinfo");
     if (!cpuFile.is_open()) return AnbernicDevice::Unknown;
 
@@ -80,13 +93,14 @@ AnbernicDevice AnbernicDetector::detectFromCpuInfo() {
         if (line.find("rk3566") != std::string::npos) {
             return AnbernicDevice::RG353P; // Default to RG353P
         }
-        // Rockchip RK3326 (used in RG351 series)
+        // Rockchip RK3326 (used in older devices)
         if (line.find("rk3326") != std::string::npos) {
             return AnbernicDevice::RG353P;
         }
     }
 
     cpuFile.close();
+#endif
     return AnbernicDevice::Unknown;
 }
 
@@ -100,21 +114,21 @@ std::string AnbernicDetector::getDeviceName() {
 
 AnbernicDeviceInfo AnbernicDetector::getDeviceInfo(AnbernicDevice device) {
     static const std::map<AnbernicDevice, AnbernicDeviceInfo> deviceMap = {
-        {AnbernicDevice::RG353P, {"RG353P", "Anbernic RG353P", 640, 480, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG353V, {"RG353V", "Anbernic RG353V", 640, 480, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG353M, {"RG353M", "Anbernic RG353M", 640, 480, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG353PS, {"RG353PS", "Anbernic RG353PS", 640, 480, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG405M, {"RG405M", "Anbernic RG405M", 640, 480, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG405V, {"RG405V", "Anbernic RG405V", 640, 480, true, true, 2, true, "RK3566"}},
-        {AnbernicDevice::RG503, {"RG503", "Anbernic RG503", 960, 544, true, true, 2, false, "RK3566"}},
-        {AnbernicDevice::RG552, {"RG552", "Anbernic RG552", 1920, 1152, true, true, 2, false, "RK3399"}},
-        {AnbernicDevice::RG35XX, {"RG35XX", "Anbernic RG35XX", 640, 480, false, false, 0, false, "H700"}},
-        {AnbernicDevice::RG35XX_Plus, {"RG35XX_Plus", "Anbernic RG35XX Plus", 640, 480, true, false, 0, false, "H700"}},
-        {AnbernicDevice::RG35XX_H, {"RG35XX_H", "Anbernic RG35XX H", 640, 480, true, false, 0, false, "H700"}},
-        {AnbernicDevice::RG28XX, {"RG28XX", "Anbernic RG28XX", 640, 480, false, false, 0, false, "H700"}},
-        {AnbernicDevice::RG_ARC_D, {"RG_ARC_D", "Anbernic RG ARC-D", 640, 480, false, true, 1, false, "RK3566"}},
-        {AnbernicDevice::RG_ARC_S, {"RG_ARC_S", "Anbernic RG ARC-S", 640, 480, false, true, 1, false, "RK3566"}},
-        {AnbernicDevice::Unknown, {"Unknown", "Unknown Device", 640, 480, false, false, 0, false, "Unknown"}}
+        {AnbernicDevice::RG353P, {AnbernicDevice::RG353P, "Anbernic RG353P", 640, 480, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG353V, {AnbernicDevice::RG353V, "Anbernic RG353V", 640, 480, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG353M, {AnbernicDevice::RG353M, "Anbernic RG353M", 640, 480, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG353PS, {AnbernicDevice::RG353PS, "Anbernic RG353PS", 640, 480, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG405M, {AnbernicDevice::RG405M, "Anbernic RG405M", 640, 480, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG405V, {AnbernicDevice::RG405V, "Anbernic RG405V", 640, 480, true, true, 2, true, "RK3566"}},
+        {AnbernicDevice::RG503, {AnbernicDevice::RG503, "Anbernic RG503", 960, 544, true, true, 2, false, "RK3566"}},
+        {AnbernicDevice::RG552, {AnbernicDevice::RG552, "Anbernic RG552", 1920, 1152, true, true, 2, false, "RK3399"}},
+        {AnbernicDevice::RG35XX, {AnbernicDevice::RG35XX, "Anbernic RG35XX", 640, 480, false, false, 0, false, "H700"}},
+        {AnbernicDevice::RG35XX_Plus, {AnbernicDevice::RG35XX_Plus, "Anbernic RG35XX Plus", 640, 480, true, false, 0, false, "H700"}},
+        {AnbernicDevice::RG35XX_H, {AnbernicDevice::RG35XX_H, "Anbernic RG35XX H", 640, 480, true, false, 0, false, "H700"}},
+        {AnbernicDevice::RG28XX, {AnbernicDevice::RG28XX, "Anbernic RG28XX", 640, 480, false, false, 0, false, "H700"}},
+        {AnbernicDevice::RG_ARC_D, {AnbernicDevice::RG_ARC_D, "Anbernic RG ARC-D", 640, 480, false, true, 1, false, "RK3566"}},
+        {AnbernicDevice::RG_ARC_S, {AnbernicDevice::RG_ARC_S, "Anbernic RG ARC-S", 640, 480, false, true, 1, false, "RK3566"}},
+        {AnbernicDevice::Unknown, {AnbernicDevice::Unknown, "Unknown Device", 640, 480, false, false, 0, false, "Unknown"}}
     };
 
     auto it = deviceMap.find(device);
